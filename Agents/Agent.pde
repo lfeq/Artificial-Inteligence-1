@@ -70,6 +70,8 @@ class Agent {
   /**
    * Resets agent position if the agent goes off screen.
    */
+   //Se queda moviendose de un lado al otro en vez de seguir su camino ninja.
+   /*
   private void resetPosition(){
     if(currentPosition.x > width){
       currentPosition.x = 1;
@@ -79,6 +81,22 @@ class Agent {
       currentPosition.y = 1;
     } else if(currentPosition.y < 0){
       currentPosition.y = height;
+    }
+  }
+  */
+  private void resetPosition(){
+    if(currentPosition.x > width){
+      currentPosition.x = random(0, width);
+      currentPosition.y = random(0, height);
+    } else if(currentPosition.x < 0){
+      currentPosition.x = random(0, width);
+      currentPosition.y = random(0, height);
+    } else if(currentPosition.y > height){
+      currentPosition.x = random(0, width);
+      currentPosition.y = random(0, height);
+    } else if(currentPosition.y < 0){
+      currentPosition.x = random(0, width);
+      currentPosition.y = random(0, height);
     }
   }
 }
