@@ -3,7 +3,7 @@
  */
 class Agent {
   PVector currentPosition, targetPosition, currentVelocity, desiredVelocity, steering;
-  float maxForce, mass, maxSpeed, slowingRadius;
+  float maxForce, mass, maxSpeed, slowingRadius, wanderDisplacement, wanderRadius;
   SteeringBehaviours steerings;
     
   /**
@@ -23,6 +23,8 @@ class Agent {
     targetPosition = new PVector(0, 0);
     currentVelocity = new PVector(0, 0);
     desiredVelocity = new PVector(0, 0);
+    wanderDisplacement = 100;
+    wanderRadius = 100;
     steering = new PVector(0, 0);
     steerings = new SteeringBehaviours();
   }
@@ -57,6 +59,11 @@ class Agent {
    */
   void arrival(){
     steerings.arrival(this, targetPosition);
+    updateVelocity();
+  }
+  
+  void wander(){
+    steerings.wander(this);
     updateVelocity();
   }
 

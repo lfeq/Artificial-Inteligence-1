@@ -13,7 +13,8 @@ void draw() {
   agentSeek.targetPosition = agentFlee.currentPosition;
   agentFlee.targetPosition = agentSeek.currentPosition;
   agentSeek.paint();
-  agentSeek.arrival();
+  agentSeek.seek();
+  agentSeek.wander();
   agentFlee.paint();
   agentFlee.flee();
 }

@@ -29,13 +29,35 @@ class SteeringBehaviours {
    * @param t_targetPos The target position that the agent is trying to reach.
    */
   void arrival(Agent t_agent, PVector t_targetPos){
-    calculateDesiredVelocity(t_agent, t_targetPos, t_agent.currentPosition);
+    t_agent.desiredVelocity = PVector.sub(t_targetPos, t_agent.currentPosition);
+    /*
     float distance = PVector.dist(t_targetPos, t_agent.currentPosition);
-    float slowing_factor = distance / t_agent.slowingRadius;
+    t_agent.desiredVelocity.normalize().mult(t_agent.maxSpeed);
     if(distance < t_agent.slowingRadius){
-      t_agent.desiredVelocity.mult(slowing_factor);
+      t_agent.desiredVelocity.mult(distance / t_agent.slowingRadius);
     }
-    calculateSteering(t_agent);
+    */
+    t_agent.desiredVelocity.normalize().mult(t_agent.maxSpeed);
+    t_agent.steering = PVector.sub(t_agent.desiredVelocity, t_agent.currentVelocity);
+    t_agent.steering.limit(t_agent.maxForce);
+    t_agent.steering.div(t_agent.mass);
+    t_agent.currentVelocity.add(t_agent.steering);
+    t_agent.currentVelocity.limit(t_agent.maxSpeed);
+    float distance = PVector.dist(t_targetPos, t_agent.currentPosition);
+    if(distance < t_agent.slowingRadius){
+      t_agent.currentVelocity.mult(distance / t_agent.slowingRadius);
+    }
+  }
+  
+  void wander(Agent t_agent){
+    PVector wheel = new PVector(t_agent.currentVelocity.x, t_agent.currentVelocity.y);
+    wheel.normalize();
+    wheel.mult(t_agent.wanderDisplacement);
+    wheel.add(t_agent.currentPosition);
+    PVector newDirection = new PVector(random(-1f, 1f), random(-1f, 1f));
+    newDirection.normalize();
+    newDirection.mult(t_agent.wanderRadius);
+    wheel.add(newDirection);
   }
   
   /**
