@@ -51,6 +51,7 @@ class Agent {
    */
   void flee(){
     steerings.flee(this, targetPosition);
+    println(steering);
     updateVelocity();
   }
   
@@ -67,6 +68,26 @@ class Agent {
     updateVelocity();
   }
 
+  void pursuit(Agent t_agent){
+    float distanceToTarget = PVector.dist(t_agent.currentPosition, currentPosition);
+    float positionPrediction = distanceToTarget / maxSpeed;
+    PVector futurePosition = PVector.add(t_agent.currentPosition, t_agent.currentVelocity.mult(positionPrediction));
+    fill(39, 43, 203);
+    circle(futurePosition.x, futurePosition.y, 32);   
+    steerings.seek(this, futurePosition);
+    updateVelocity();
+  }
+  
+  void evade(Agent t_agent){
+    float distanceToTarget = PVector.dist(t_agent.currentPosition, currentPosition);
+    float positionPrediction = distanceToTarget / maxSpeed;
+    PVector futurePosition = PVector.add(t_agent.currentPosition, t_agent.currentVelocity.mult(positionPrediction)); 
+    fill(211, 38, 189);
+    circle(futurePosition.x, futurePosition.y, 32);
+    steerings.flee(this, futurePosition);
+    updateVelocity();
+  }
+
   /**
    * Adds current velocity to current position.
    */
@@ -78,7 +99,7 @@ class Agent {
    * Resets agent position if the agent goes off screen.
    */
    //Se queda moviendose de un lado al otro en vez de seguir su camino ninja.
-   /*
+   
   private void resetPosition(){
     if(currentPosition.x > width){
       currentPosition.x = 1;
@@ -90,7 +111,8 @@ class Agent {
       currentPosition.y = height;
     }
   }
-  */
+  
+  /*
   private void resetPosition(){
     if(currentPosition.x > width){
       currentPosition.x = random(0, width);
@@ -106,4 +128,5 @@ class Agent {
       currentPosition.y = random(0, height);
     }
   }
+  */
 }

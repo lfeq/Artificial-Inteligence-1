@@ -3,8 +3,8 @@ PVector target;
 
 void setup() {
   size(800, 800);
-  agentSeek = new Agent(new PVector(0, 0), 10, 20, 10, 180);
-  agentFlee = new Agent(new PVector(width/2, height/2), 10, 10, 7, 180);
+  agentSeek = new Agent(new PVector(0, 0), 10, 20, 3, 180);
+  agentFlee = new Agent(new PVector(width/2, height/2), 10, 10, 2, 180);
 }
 
 void draw() {
@@ -13,8 +13,9 @@ void draw() {
   agentSeek.targetPosition = agentFlee.currentPosition;
   agentFlee.targetPosition = agentSeek.currentPosition;
   agentSeek.paint();
+  agentSeek.pursuit(agentFlee);
   agentSeek.seek();
-  agentSeek.wander();
   agentFlee.paint();
   agentFlee.flee();
+  agentFlee.evade(agentSeek);
 }
