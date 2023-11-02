@@ -3,8 +3,11 @@
  */
 class Agent {
   PVector currentPosition, targetPosition, currentVelocity, desiredVelocity, steering;
-  float maxForce, mass, maxSpeed, slowingRadius, wanderDisplacement, wanderRadius;
+  float maxForce, mass, maxSpeed, slowingRadius, wanderDisplacement, wanderRadius, 
+  pathRadius, pathDirection;
   SteeringBehaviours steerings;
+  Path path;
+  int currentNode;
     
   /**
    * Constructor for the Agent class.
@@ -14,7 +17,7 @@ class Agent {
    * @param t_maxSpeed The maximum speed of the agent.
    * @param t_slowing_radius The radius within which the agent starts to slow down.
    */
-  Agent(PVector t_targetPos, float t_maxForce, float t_mass, float t_maxSpeed, float t_slowing_radius) {
+  Agent(PVector t_targetPos, float t_maxForce, float t_mass, float t_maxSpeed, float t_slowing_radius, Path t_path) {
     currentPosition = t_targetPos;
     maxForce = t_maxForce;
     mass = t_mass;
@@ -27,6 +30,10 @@ class Agent {
     wanderRadius = 100;
     steering = new PVector(0, 0);
     steerings = new SteeringBehaviours();
+    path = t_path;
+    currentNode = 0;
+    pathRadius = 50;
+    pathDirection = 1;
   }
   
   /**
@@ -85,6 +92,21 @@ class Agent {
     fill(211, 38, 189);
     circle(futurePosition.x, futurePosition.y, 32);
     steerings.flee(this, futurePosition);
+    updateVelocity();
+  }
+
+  void pathFollowing(){
+    PVector target;
+    ArrayList<PVector> nodes = path.getNodes();
+    target = nodes.get(currentNode);
+    if (PVector.dist(target, currentPosition) < pathRadius){
+      currentNode += pathDirection;;
+      if(currentNode >= nodes.size() || currentNode < 0){
+        pathDirection *= -1;
+        currentNode += pathDirection;
+      }
+    }
+    steerings.seek(this, target);
     updateVelocity();
   }
 
