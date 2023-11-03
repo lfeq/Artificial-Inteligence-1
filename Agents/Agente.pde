@@ -6,7 +6,7 @@ ArrayList<Agent> agents;
 void setup() {
   size(800, 800);
   pathCreation();
-  agents = new ArrayList<Agent>(); //<>//
+  agents = new ArrayList<Agent>();
   agentSeek = new Agent(new PVector(0, 0), 10, 20, 3, 180, path, agents); 
   agentFlee = new Agent(new PVector(width/2, height/2), 10, 10, 3, 180, path, agents);
   agentFollowLeader1 = new Agent(new PVector(random(0, 800), random(0, 800)), 10, 10, 3, 180, path, agents);
