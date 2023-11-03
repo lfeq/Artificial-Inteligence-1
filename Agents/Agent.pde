@@ -4,10 +4,12 @@
 class Agent {
   PVector currentPosition, targetPosition, currentVelocity, desiredVelocity, steering;
   float maxForce, mass, maxSpeed, slowingRadius, wanderDisplacement, wanderRadius, 
-  pathRadius, pathDirection;
+  pathRadius, pathDirection, leaderBehindDistance, separationRadius, maxSeparation,
+  leaderSightRadius;
   SteeringBehaviours steerings;
   Path path;
   int currentNode;
+  ArrayList<Agent> agents;
     
   /**
    * Constructor for the Agent class.
@@ -17,7 +19,8 @@ class Agent {
    * @param t_maxSpeed The maximum speed of the agent.
    * @param t_slowing_radius The radius within which the agent starts to slow down.
    */
-  Agent(PVector t_targetPos, float t_maxForce, float t_mass, float t_maxSpeed, float t_slowing_radius, Path t_path) {
+  Agent(PVector t_targetPos, float t_maxForce, float t_mass, float t_maxSpeed, float t_slowing_radius, Path t_path,
+  ArrayList<Agent> t_agents) {
     currentPosition = t_targetPos;
     maxForce = t_maxForce;
     mass = t_mass;
@@ -34,6 +37,11 @@ class Agent {
     currentNode = 0;
     pathRadius = 50;
     pathDirection = 1;
+    leaderBehindDistance = 30f;
+    agents = t_agents;
+    separationRadius = 25;
+    maxSeparation = 50;
+    leaderSightRadius = 30;
   }
   
   /**
@@ -78,9 +86,9 @@ class Agent {
   void pursuit(Agent t_agent){
     float distanceToTarget = PVector.dist(t_agent.currentPosition, currentPosition);
     float positionPrediction = distanceToTarget / maxSpeed;
-    PVector futurePosition = PVector.add(t_agent.currentPosition, t_agent.currentVelocity.mult(positionPrediction));
-    fill(39, 43, 203);
-    circle(futurePosition.x, futurePosition.y, 32);   
+    PVector futurePosition = PVector.add(t_agent.currentPosition, t_agent.currentVelocity.copy().mult(positionPrediction));
+    //fill(39, 43, 203);
+    //circle(futurePosition.x, futurePosition.y, 32);   
     steerings.seek(this, futurePosition);
     updateVelocity();
   }
@@ -88,9 +96,9 @@ class Agent {
   void evade(Agent t_agent){
     float distanceToTarget = PVector.dist(t_agent.currentPosition, currentPosition);
     float positionPrediction = distanceToTarget / maxSpeed;
-    PVector futurePosition = PVector.add(t_agent.currentPosition, t_agent.currentVelocity.mult(positionPrediction)); 
-    fill(211, 38, 189);
-    circle(futurePosition.x, futurePosition.y, 32);
+    PVector futurePosition = PVector.add(t_agent.currentPosition, t_agent.currentVelocity.copy().mult(positionPrediction)); 
+    //fill(211, 38, 189);
+    //circle(futurePosition.x, futurePosition.y, 32);
     steerings.flee(this, futurePosition);
     updateVelocity();
   }
@@ -110,6 +118,46 @@ class Agent {
     updateVelocity();
   }
 
+  void followLeader(Agent t_leader){
+    PVector leaderVelocity = t_leader.currentVelocity.copy();
+    PVector behind;
+    PVector ahead;
+    leaderVelocity.normalize();
+    leaderVelocity.mult(leaderBehindDistance);
+    ahead = t_leader.currentPosition.copy();
+    ahead.add(leaderVelocity);
+    leaderVelocity.mult(-1);
+    behind = t_leader.currentPosition.copy();
+    behind.add(leaderVelocity);
+    if(PVector.dist(ahead, currentPosition) <= leaderSightRadius || PVector.dist(t_leader.currentPosition, currentPosition) <= leaderSightRadius){
+      evade(t_leader);
+    }
+    steerings.arrival(this, PVector.add(behind, separation()));
+    separation();
+    updateVelocity();
+  }
+  
+  PVector separation(){
+    PVector force = new PVector();
+    int neighbourCount = 0;
+    for(int i = 0; i < agents.size(); i++){
+      Agent tempAgent = agents.get(i);
+      if(tempAgent != this && PVector.dist(tempAgent.currentPosition, currentPosition) <= separationRadius){
+        force.x += tempAgent.currentPosition.x - currentPosition.x;
+        force.y += tempAgent.currentPosition.y - currentPosition.y;
+        neighbourCount++;
+      }
+    }
+    if(neighbourCount != 0){
+      force.x /= neighbourCount;
+      force.y /= neighbourCount;
+      force.mult(-1);
+    }
+    force.normalize();
+    force.mult(maxSeparation);
+    return force;
+  }
+
   /**
    * Adds current velocity to current position.
    */
@@ -121,20 +169,20 @@ class Agent {
    * Resets agent position if the agent goes off screen.
    */
    //Se queda moviendose de un lado al otro en vez de seguir su camino ninja.
-   
+  /* 
   private void resetPosition(){
     if(currentPosition.x > width){
       currentPosition.x = 1;
     } else if(currentPosition.x < 0){
       currentPosition.x = width;
-    } else if(currentPosition.y > height){
+    } if(currentPosition.y > height){
       currentPosition.y = 1;
     } else if(currentPosition.y < 0){
       currentPosition.y = height;
     }
   }
+  */
   
-  /*
   private void resetPosition(){
     if(currentPosition.x > width){
       currentPosition.x = random(0, width);
@@ -150,5 +198,5 @@ class Agent {
       currentPosition.y = random(0, height);
     }
   }
-  */
+  
 }
