@@ -24,26 +24,7 @@ void draw() {
   //pursuitAndEvade();
   //pathFollowing();
   followLeader();
-  /*
-  fill(129, 68, 3);
-  circle(doorPosition.x, doorPosition.y, 20);
-  agentFlee.targetPosition = doorPosition;
-  agentFollowLeader1.targetPosition = doorPosition;
-  agentFollowLeader2.targetPosition = doorPosition;
-  agentFollowLeader3.targetPosition = doorPosition;
-  agentFlee.paint();
-  agentFlee.seek();
-  agentFlee.queue();
-  agentFollowLeader1.paint();
-  agentFollowLeader1.seek();
-  agentFollowLeader1.queue();
-  agentFollowLeader2.paint();
-  agentFollowLeader2.seek();
-  agentFollowLeader2.queue();
-  agentFollowLeader3.paint();
-  agentFollowLeader3.seek();
-  agentFollowLeader3.queue();
-  */
+  //showQueue();
 }
 
 void pursuitAndEvade(){
@@ -71,6 +52,27 @@ void followLeader(){
   agentFollowLeader2.followLeader(agentSeek);
   agentFollowLeader3.paint();
   agentFollowLeader3.followLeader(agentSeek);
+}
+
+void showQueue(){
+  fill(129, 68, 3);
+  circle(doorPosition.x, doorPosition.y, 20);
+  agentFlee.targetPosition = doorPosition;
+  agentFollowLeader1.targetPosition = doorPosition;
+  agentFollowLeader2.targetPosition = doorPosition;
+  agentFollowLeader3.targetPosition = doorPosition;
+  agentFlee.paint();
+  agentFlee.seek();
+  agentFlee.queue();
+  agentFollowLeader1.paint();
+  agentFollowLeader1.seek();
+  agentFollowLeader1.queue();
+  agentFollowLeader2.paint();
+  agentFollowLeader2.seek();
+  agentFollowLeader2.queue();
+  agentFollowLeader3.paint();
+  agentFollowLeader3.seek();
+  agentFollowLeader3.queue();
 }
 
 void pathCreation(){

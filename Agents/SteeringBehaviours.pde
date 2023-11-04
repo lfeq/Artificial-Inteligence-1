@@ -7,59 +7,28 @@ class SteeringBehaviours {
    * Moves the agent towards the target position.
    * @param t_agent The agent that is being controlled.
    * @param t_targetPos The target position that the agent is trying to reach.
+   * @return A PVector representing the steering force.
    */
   PVector seek(Agent t_agent, PVector t_targetPos) {
     calculateDesiredVelocity(t_agent, t_targetPos, t_agent.currentPosition);
-    //calculateSteering(t_agent);
-    PVector steering = PVector.sub(t_agent.desiredVelocity, t_agent.currentVelocity); 
-    steering.limit(t_agent.maxForce);
-    steering.div(t_agent.mass);
-    return steering;
+    return calculateSteering(t_agent);
   }
   
   /**
    * Moves the agent away from the target position.
    * @param t_agent The agent that is being controlled.
    * @param t_targetPos The target position that the agent is trying to move away from.
+   * @return A PVector representing the steering force.
    */
   PVector flee(Agent t_agent, PVector t_targetPos){
     calculateDesiredVelocity(t_agent, t_agent.currentPosition, t_targetPos);
-    //calculateSteering(t_agent);
-    PVector steering = PVector.sub(t_agent.desiredVelocity, t_agent.currentVelocity); 
-    steering.limit(t_agent.maxForce);
-    steering.div(t_agent.mass);
-    return steering;
+    return calculateSteering(t_agent);
   }
   
   /**
-   * Moves the agent towards the target position and slows down when it gets close.
+   * Simulates a wandering behavior for the agent.
    * @param t_agent The agent that is being controlled.
-   * @param t_targetPos The target position that the agent is trying to reach.
    */
-  PVector arrival(Agent t_agent, PVector t_targetPos){
-    t_agent.desiredVelocity = PVector.sub(t_targetPos, t_agent.currentPosition);
-    /*
-    float distance = PVector.dist(t_targetPos, t_agent.currentPosition);
-    t_agent.desiredVelocity.normalize().mult(t_agent.maxSpeed);
-    if(distance < t_agent.slowingRadius){
-      t_agent.desiredVelocity.mult(distance / t_agent.slowingRadius);
-    }
-    */
-    t_agent.desiredVelocity.normalize().mult(t_agent.maxSpeed);
-    PVector steering = PVector.sub(t_agent.desiredVelocity, t_agent.currentVelocity);
-    steering.limit(t_agent.maxForce);
-    steering.div(t_agent.mass);
-    return steering;
-    /*
-    t_agent.currentVelocity.add(t_agent.steering);
-    t_agent.currentVelocity.limit(t_agent.maxSpeed);
-    float distance = PVector.dist(t_targetPos, t_agent.currentPosition);
-    if(distance < t_agent.slowingRadius){
-      t_agent.currentVelocity.mult(distance / t_agent.slowingRadius);
-    }
-    */
-  }
-  
   void wander(Agent t_agent){
     PVector wheel = new PVector(t_agent.currentVelocity.x, t_agent.currentVelocity.y);
     wheel.normalize();
@@ -71,6 +40,12 @@ class SteeringBehaviours {
     wheel.add(newDirection);
   }
   
+  /**
+   * Moves the agent to evade another agent.
+   * @param t_agent The agent that is being controlled.
+   * @param t_agentToEvade The agent to evade.
+   * @return A PVector representing the steering force.
+   */
   PVector evade(Agent t_agent, Agent t_agentToEvade){
     float distanceToTarget = PVector.dist(t_agentToEvade.currentPosition, t_agent.currentPosition);
     float positionPrediction = distanceToTarget / t_agent.maxSpeed;
@@ -78,6 +53,12 @@ class SteeringBehaviours {
     return flee(t_agent, futurePosition);
   }
   
+  /**
+   * Causes the agent to follow a leader agent.
+   * @param t_leader The leader agent that the agent is following.
+   * @param t_agent The agent that is following the leader.
+   * @return A PVector representing the steering force.
+   */
   PVector followLeader(Agent t_leader, Agent t_agent){
     PVector leaderVelocity = t_leader.currentVelocity.copy();
     PVector force = new PVector();
@@ -93,11 +74,16 @@ class SteeringBehaviours {
     if(PVector.dist(ahead, t_agent.currentPosition) <= t_agent.leaderSightRadius || PVector.dist(t_leader.currentPosition, t_agent.currentPosition) <= t_agent.leaderSightRadius){
       force.add(evade(t_agent, t_leader));
     }
-    force.add(arrival(t_agent, behind));
+    force.add(seek(t_agent, behind));
     force.add(separation(t_agent));
     return force;
   }
   
+  /**
+   * Calculates a steering force for separation from nearby agents.
+   * @param t_agent The agent that is being controlled.
+   * @return A PVector representing the steering force.
+   */
   PVector separation(Agent t_agent){
     PVector force = new PVector();
     int neighbourCount = 0;
@@ -120,15 +106,58 @@ class SteeringBehaviours {
   }
   
   /**
+   * Calculates a steering force for separation from nearby agents.
+   * @param t_agent The agent that is being controlled.
+   * @return A PVector representing the steering force.
+   */
+  Agent getNeighborAhead(Agent t_agent){
+    Agent neighbourAhead = null;
+    PVector currentVelocityCopy = t_agent.currentVelocity.copy();
+    PVector ahead = t_agent.currentPosition.copy();
+    currentVelocityCopy.normalize().mult(t_agent.maxQueueAhead);
+    ahead.add(currentVelocityCopy);
+    for(int i = 0; i < t_agent.agents.size(); i++){
+      Agent neighbor = t_agent.agents.get(i);
+      float distance = PVector.dist(ahead, neighbor.currentPosition);
+      if(neighbor != t_agent && distance <= t_agent.maxQueueRadius){
+        neighbourAhead = neighbor;
+        return neighbourAhead;
+      }
+    }
+    return neighbourAhead;
+  }
+  
+  /**
+   * Calculates a steering force for queue behavior.
+   * @param t_agent The agent that is following the leader.
+   * @return A PVector representing the braking force.
+   */
+  PVector queue(Agent t_agent){
+    Agent neighbor = getNeighborAhead(t_agent);
+    PVector velocityCopy = t_agent.currentVelocity.copy();
+    PVector brake = new PVector(0, 0);
+    if(neighbor != null){
+      brake.x = -t_agent.steering.x * 0.8f;
+      brake.y = -t_agent.steering.y * 0.8f;
+      velocityCopy.mult(-1);
+      brake.add(velocityCopy);
+      brake.add(separation(t_agent));
+      if(PVector.dist(t_agent.currentPosition, neighbor.currentPosition) <= t_agent.maxQueueRadius){
+        t_agent.currentVelocity.mult(0.3f);
+      }
+    }
+    return brake;
+  }
+  
+  /**
    * Calculates the steering force.
    * @param t_agent The agent that is being controlled.
    */
-  private void calculateSteering(Agent t_agent){
-    t_agent.steering = PVector.sub(t_agent.desiredVelocity, t_agent.currentVelocity); 
-    t_agent.steering.limit(t_agent.maxForce);
-    t_agent.steering.div(t_agent.mass);
-    t_agent.currentVelocity.add(t_agent.steering);
-    t_agent.currentVelocity.limit(t_agent.maxSpeed);
+  private PVector calculateSteering(Agent t_agent){
+    PVector steering = PVector.sub(t_agent.desiredVelocity, t_agent.currentVelocity); 
+    steering.limit(t_agent.maxForce);
+    steering.div(t_agent.mass);
+    return steering;
   }
   
   /**

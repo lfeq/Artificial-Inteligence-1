@@ -18,6 +18,8 @@ class Agent {
    * @param t_mass The mass of the agent.
    * @param t_maxSpeed The maximum speed of the agent.
    * @param t_slowing_radius The radius within which the agent starts to slow down.
+   * @param t_path The path for the agent to follow.
+   * @param t_agents The list of other agents for separation and leader following.
    */
   Agent(PVector t_targetPos, float t_maxForce, float t_mass, float t_maxSpeed, float t_slowing_radius, Path t_path,
   ArrayList<Agent> t_agents) {
@@ -77,21 +79,27 @@ class Agent {
    * Makes the agent arrive at the target position.
    */
   void arrival(){
-    currentVelocity.add(steerings.arrival(this, targetPosition));
+    currentVelocity.add(steerings.seek(this, targetPosition));
     currentVelocity.limit(maxSpeed);
     float distance = PVector.dist(targetPosition, currentPosition);
-    println(distance);
     if(distance < slowingRadius){
       currentVelocity.mult(distance / slowingRadius);
     }
     updateVelocity();
   }
   
+  /**
+   * Simulates wandering behavior for the agent.
+   */
   void wander(){
     steerings.wander(this);
     updateVelocity();
   }
 
+  /**
+   * Makes the agent pursue another agent.
+   * @param t_agent The agent to pursue.
+   */
   void pursuit(Agent t_agent){
     float distanceToTarget = PVector.dist(t_agent.currentPosition, currentPosition);
     float positionPrediction = distanceToTarget / maxSpeed;
@@ -103,6 +111,10 @@ class Agent {
     updateVelocity();
   }
   
+  /**
+   * Makes the agent evade another agent.
+   * @param t_agent The agent to evade.
+   */
   void evade(Agent t_agent){
     float distanceToTarget = PVector.dist(t_agent.currentPosition, currentPosition);
     float positionPrediction = distanceToTarget / maxSpeed;
@@ -114,6 +126,9 @@ class Agent {
     updateVelocity();
   }
 
+  /**
+   * Makes the agent follow a path.
+   */
   void pathFollowing(){
     PVector target;
     ArrayList<PVector> nodes = path.getNodes();
@@ -130,57 +145,29 @@ class Agent {
     updateVelocity();
   }
 
+  /**
+   * Makes the agent follow a leader agent.
+   * @param t_leader The leader agent to follow.
+   */
   void followLeader(Agent t_leader){
     steering = new PVector();
     steering.add(steerings.followLeader(t_leader, this));
     steering.div(mass);
     currentVelocity.add(steering);
+    currentVelocity.limit(maxSpeed);
     updateVelocity();
   }
   
-  PVector separation(){
-    PVector force = new PVector();
-    int neighbourCount = 0;
-    for(int i = 0; i < agents.size(); i++){
-      Agent tempAgent = agents.get(i);
-      if(tempAgent != this && PVector.dist(tempAgent.currentPosition, currentPosition) <= separationRadius){
-        force.x += tempAgent.currentPosition.x - currentPosition.x;
-        force.y += tempAgent.currentPosition.y - currentPosition.y;
-        neighbourCount++;
-      }
-    }
-    if(neighbourCount != 0){
-      force.x /= neighbourCount;
-      force.y /= neighbourCount;
-      force.mult(-1);
-    }
-    force.normalize();
-    force.mult(maxSeparation);
-    return force;
-  }
-  
-  Agent getNeighborAhead(){
-    Agent neighbourAhead = null;
-    PVector currentVelocityCopy = currentVelocity.copy();
-    PVector ahead = currentPosition.copy();
-    currentVelocityCopy.normalize().mult(maxQueueAhead);
-    ahead.add(currentVelocityCopy);
-    for(int i = 0; i < agents.size(); i++){
-      Agent neighbor = agents.get(i);
-      float distance = PVector.dist(ahead, neighbor.currentPosition);
-      if(neighbor != this && distance <= maxQueueRadius){
-        neighbourAhead = neighbor;
-        break;
-      }
-    }
-    return neighbourAhead;
-  }
-  
+  /**
+   * Makes the agent simulate queue behavior.
+   */
   void queue(){
-    Agent neighbor = getNeighborAhead();
-    if(neighbor != null){
-      
-    }
+    steering = steerings.seek(this, targetPosition);
+    steering.add(steerings.queue(this));
+    steering.div(mass);
+    currentVelocity.add(steering);
+    currentVelocity.limit(maxSpeed);
+    updateVelocity();
   }
 
   /**
