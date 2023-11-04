@@ -41,7 +41,7 @@ class Agent {
     agents = t_agents;
     separationRadius = 25;
     maxSeparation = 50;
-    leaderSightRadius = 240;
+    leaderSightRadius = 30;
     maxQueueAhead = 50;
     maxQueueRadius = 30;
   }
@@ -59,8 +59,7 @@ class Agent {
    * Makes the agent move towards the target position.
    */
   void seek() { 
-    currentVelocity.add(steerings.seek(this, targetPosition));
-    currentVelocity.limit(maxSpeed);
+    steerings.seek(this, targetPosition);
     updateVelocity();
   }
   
@@ -68,8 +67,8 @@ class Agent {
    * Makes the agent move away from the target position.
    */
   void flee(){
-    currentVelocity.add(steerings.flee(this, targetPosition));
-    currentVelocity.limit(maxSpeed);
+    steerings.flee(this, targetPosition);
+    println(steering);
     updateVelocity();
   }
   
@@ -77,13 +76,7 @@ class Agent {
    * Makes the agent arrive at the target position.
    */
   void arrival(){
-    currentVelocity.add(steerings.arrival(this, targetPosition));
-    currentVelocity.limit(maxSpeed);
-    float distance = PVector.dist(targetPosition, currentPosition);
-    println(distance);
-    if(distance < slowingRadius){
-      currentVelocity.mult(distance / slowingRadius);
-    }
+    steerings.arrival(this, targetPosition);
     updateVelocity();
   }
   
@@ -98,8 +91,7 @@ class Agent {
     PVector futurePosition = PVector.add(t_agent.currentPosition, t_agent.currentVelocity.copy().mult(positionPrediction));
     //fill(39, 43, 203);
     //circle(futurePosition.x, futurePosition.y, 32);   
-    currentVelocity.add(steerings.seek(this, futurePosition));
-    currentVelocity.limit(maxSpeed);
+    steerings.seek(this, futurePosition);
     updateVelocity();
   }
   
@@ -109,8 +101,7 @@ class Agent {
     PVector futurePosition = PVector.add(t_agent.currentPosition, t_agent.currentVelocity.copy().mult(positionPrediction)); 
     //fill(211, 38, 189);
     //circle(futurePosition.x, futurePosition.y, 32);
-    currentVelocity.add(steerings.flee(this, futurePosition));
-    currentVelocity.limit(maxSpeed);
+    steerings.flee(this, futurePosition);
     updateVelocity();
   }
 
@@ -125,16 +116,26 @@ class Agent {
         currentNode += pathDirection;
       }
     }
-    currentVelocity.add(steerings.seek(this, target));
-    currentVelocity.limit(maxSpeed);
+    steerings.seek(this, target);
     updateVelocity();
   }
 
   void followLeader(Agent t_leader){
-    steering = new PVector();
-    steering.add(steerings.followLeader(t_leader, this));
-    steering.div(mass);
-    currentVelocity.add(steering);
+    PVector leaderVelocity = t_leader.currentVelocity.copy();
+    PVector behind;
+    PVector ahead;
+    leaderVelocity.normalize();
+    leaderVelocity.mult(leaderBehindDistance);
+    ahead = t_leader.currentPosition.copy();
+    ahead.add(leaderVelocity);
+    leaderVelocity.mult(-1);
+    behind = t_leader.currentPosition.copy();
+    behind.add(leaderVelocity);
+    if(PVector.dist(ahead, currentPosition) <= leaderSightRadius || PVector.dist(t_leader.currentPosition, currentPosition) <= leaderSightRadius){
+      evade(t_leader);
+    }
+    steerings.arrival(this, PVector.add(behind, separation()));
+    separation();
     updateVelocity();
   }
   
@@ -178,9 +179,15 @@ class Agent {
   
   void queue(){
     Agent neighbor = getNeighborAhead();
+    PVector velocityCopy = currentVelocity.copy();
+    PVector breake = new PVector(0, 0);
     if(neighbor != null){
-      
+      breake.x = -steering.x * 0.8f;
+      breake.y = -steering.y * 0.8f;
+      velocityCopy.mult(-1);
+      breake.add(velocityCopy);
     }
+    
   }
 
   /**

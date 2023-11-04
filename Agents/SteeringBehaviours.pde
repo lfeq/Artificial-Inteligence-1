@@ -8,9 +8,13 @@ class SteeringBehaviours {
    * @param t_agent The agent that is being controlled.
    * @param t_targetPos The target position that the agent is trying to reach.
    */
-  void seek(Agent t_agent, PVector t_targetPos) {
+  PVector seek(Agent t_agent, PVector t_targetPos) {
     calculateDesiredVelocity(t_agent, t_targetPos, t_agent.currentPosition);
-    calculateSteering(t_agent);
+    //calculateSteering(t_agent);
+    PVector steering = PVector.sub(t_agent.desiredVelocity, t_agent.currentVelocity); 
+    steering.limit(t_agent.maxForce);
+    steering.div(t_agent.mass);
+    return steering;
   }
   
   /**
@@ -18,9 +22,13 @@ class SteeringBehaviours {
    * @param t_agent The agent that is being controlled.
    * @param t_targetPos The target position that the agent is trying to move away from.
    */
-  void flee(Agent t_agent, PVector t_targetPos){
+  PVector flee(Agent t_agent, PVector t_targetPos){
     calculateDesiredVelocity(t_agent, t_agent.currentPosition, t_targetPos);
-    calculateSteering(t_agent);
+    //calculateSteering(t_agent);
+    PVector steering = PVector.sub(t_agent.desiredVelocity, t_agent.currentVelocity); 
+    steering.limit(t_agent.maxForce);
+    steering.div(t_agent.mass);
+    return steering;
   }
   
   /**
@@ -28,7 +36,7 @@ class SteeringBehaviours {
    * @param t_agent The agent that is being controlled.
    * @param t_targetPos The target position that the agent is trying to reach.
    */
-  void arrival(Agent t_agent, PVector t_targetPos){
+  PVector arrival(Agent t_agent, PVector t_targetPos){
     t_agent.desiredVelocity = PVector.sub(t_targetPos, t_agent.currentPosition);
     /*
     float distance = PVector.dist(t_targetPos, t_agent.currentPosition);
@@ -38,15 +46,18 @@ class SteeringBehaviours {
     }
     */
     t_agent.desiredVelocity.normalize().mult(t_agent.maxSpeed);
-    t_agent.steering = PVector.sub(t_agent.desiredVelocity, t_agent.currentVelocity);
-    t_agent.steering.limit(t_agent.maxForce);
-    t_agent.steering.div(t_agent.mass);
+    PVector steering = PVector.sub(t_agent.desiredVelocity, t_agent.currentVelocity);
+    steering.limit(t_agent.maxForce);
+    steering.div(t_agent.mass);
+    return steering;
+    /*
     t_agent.currentVelocity.add(t_agent.steering);
     t_agent.currentVelocity.limit(t_agent.maxSpeed);
     float distance = PVector.dist(t_targetPos, t_agent.currentPosition);
     if(distance < t_agent.slowingRadius){
       t_agent.currentVelocity.mult(distance / t_agent.slowingRadius);
     }
+    */
   }
   
   void wander(Agent t_agent){
@@ -58,6 +69,54 @@ class SteeringBehaviours {
     newDirection.normalize();
     newDirection.mult(t_agent.wanderRadius);
     wheel.add(newDirection);
+  }
+  
+  PVector evade(Agent t_agent, Agent t_agentToEvade){
+    float distanceToTarget = PVector.dist(t_agentToEvade.currentPosition, t_agent.currentPosition);
+    float positionPrediction = distanceToTarget / t_agent.maxSpeed;
+    PVector futurePosition = PVector.add(t_agentToEvade.currentPosition, t_agentToEvade.currentVelocity.copy().mult(positionPrediction));
+    return flee(t_agent, futurePosition);
+  }
+  
+  PVector followLeader(Agent t_leader, Agent t_agent){
+    PVector leaderVelocity = t_leader.currentVelocity.copy();
+    PVector force = new PVector();
+    PVector behind;
+    PVector ahead;
+    leaderVelocity.normalize();
+    leaderVelocity.mult(t_agent.leaderBehindDistance);
+    ahead = t_leader.currentPosition.copy();
+    ahead.add(leaderVelocity);
+    leaderVelocity.mult(-1);
+    behind = t_leader.currentPosition.copy();
+    behind.add(leaderVelocity);
+    if(PVector.dist(ahead, t_agent.currentPosition) <= t_agent.leaderSightRadius || PVector.dist(t_leader.currentPosition, t_agent.currentPosition) <= t_agent.leaderSightRadius){
+      force.add(evade(t_agent, t_leader));
+    }
+    force.add(arrival(t_agent, behind));
+    force.add(separation(t_agent));
+    return force;
+  }
+  
+  PVector separation(Agent t_agent){
+    PVector force = new PVector();
+    int neighbourCount = 0;
+    for(int i = 0; i < t_agent.agents.size(); i++){
+      Agent tempAgent = t_agent.agents.get(i);
+      if(tempAgent != t_agent && PVector.dist(tempAgent.currentPosition, t_agent.currentPosition) <= t_agent.separationRadius){
+        force.x += tempAgent.currentPosition.x - t_agent.currentPosition.x;
+        force.y += tempAgent.currentPosition.y - t_agent.currentPosition.y;
+        neighbourCount++;
+      }
+    }
+    if(neighbourCount != 0){
+      force.x /= neighbourCount;
+      force.y /= neighbourCount;
+      force.mult(-1);
+    }
+    force.normalize();
+    force.mult(t_agent.maxSeparation);
+    return force;
   }
   
   /**
