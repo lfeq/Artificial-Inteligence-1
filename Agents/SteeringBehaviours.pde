@@ -149,6 +149,18 @@ class SteeringBehaviours {
     return brake;
   }
   
+  void leaderQueue(Agent t_agent){
+    for(int  i = 0; i < t_agent.agents.size(); i++){
+      Agent tempAgent =  t_agent.agents.get(i);
+      if(i == 0){
+        tempAgent.seek();
+        continue;
+      }
+      tempAgent.targetPosition = t_agent.agents.get(i - 1).currentPosition;
+      tempAgent.seek();
+    }
+  }
+  
   /**
    * Calculates the steering force.
    * @param t_agent The agent that is being controlled.

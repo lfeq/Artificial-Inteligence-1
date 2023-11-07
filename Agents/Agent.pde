@@ -169,6 +169,10 @@ class Agent {
     currentVelocity.limit(maxSpeed);
     updateVelocity();
   }
+  
+  void queue2(){
+    steerings.leaderQueue(this);
+  }
 
   /**
    * Adds current velocity to current position.

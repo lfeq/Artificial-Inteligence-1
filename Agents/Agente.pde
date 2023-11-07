@@ -12,6 +12,7 @@ void setup() {
   agentFollowLeader1 = new Agent(new PVector(random(0, 800), random(0, 800)), 10, 10, 3, 30, path, agents);
   agentFollowLeader2 = new Agent(new PVector(random(0, 800), random(0, 800)), 10, 10, 3, 30, path, agents);
   agentFollowLeader3 = new Agent(new PVector(random(0, 800), random(0, 800)), 10, 10, 3, 30, path, agents);
+  agents.add(agentSeek);
   agents.add(agentFlee);
   agents.add(agentFollowLeader1);
   agents.add(agentFollowLeader2);
@@ -23,8 +24,9 @@ void draw() {
   background(100);
   //pursuitAndEvade();
   //pathFollowing();
-  followLeader();
+  //followLeader();
   //showQueue();
+  showQueue2();
 }
 
 void pursuitAndEvade(){
@@ -73,6 +75,17 @@ void showQueue(){
   agentFollowLeader3.paint();
   agentFollowLeader3.seek();
   agentFollowLeader3.queue();
+}
+
+void showQueue2(){
+  agentSeek.targetPosition = new PVector(mouseX, mouseY);
+  agentSeek.paint();
+  agentSeek.queue2();
+  agentFlee.paint();
+  agentFlee.paint();
+  agentFollowLeader1.paint();
+  agentFollowLeader2.paint();
+  agentFollowLeader3.paint();
 }
 
 void pathCreation(){
