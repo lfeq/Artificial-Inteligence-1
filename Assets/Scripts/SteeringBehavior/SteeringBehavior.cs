@@ -8,7 +8,7 @@ public class SteeringBehavior {
         Vector3 desiredVelocity = t_agent.transform.position - t_tagetPosition;
         desiredVelocity = desiredVelocity.normalized * t_agent.getMaxSpeed(); //Multiplicar por max speed
         Vector3 steering = desiredVelocity - t_agent.getCurrentSpeed();
-        //steering = Vector3.Lerp(Vector3.zero, t_agent.getMaxForce(), steering);
+        steering = Vector3.ClampMagnitude(steering, t_agent.getMaxForce());
         steering /= t_agent.getMass();
         return steering;
     }

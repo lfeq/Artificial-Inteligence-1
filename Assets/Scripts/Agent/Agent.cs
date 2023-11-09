@@ -8,9 +8,17 @@ public class Agent : MonoBehaviour {
     [SerializeField] private float maxForce = 5;
 
     private Rigidbody rb;
+    private SteeringBehavior steeringBehavior;
 
     private void Start() {
         rb = GetComponent<Rigidbody>();
+        steeringBehavior = new SteeringBehavior();
+    }
+
+    private void Update() {
+        Vector3 target = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        print(target);
+        rb.velocity += steeringBehavior.seek(this, target);
     }
 
     public float getMass() {
