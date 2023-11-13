@@ -6,19 +6,17 @@ using UnityEngine;
 public class Agent : MonoBehaviour {
     [SerializeField] private float maxSpeed = 5;
     [SerializeField] private float maxForce = 5;
+    [SerializeField] private float slowingRadius = 5;
+    [SerializeField] private Transform target;
 
     private Rigidbody rb;
-    private SteeringBehavior steeringBehavior;
 
     private void Start() {
         rb = GetComponent<Rigidbody>();
-        steeringBehavior = new SteeringBehavior();
     }
 
     private void Update() {
-        Vector3 target = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        print(target);
-        rb.velocity += steeringBehavior.seek(this, target);
+        rb.velocity = SteeringBehavior.seek(this, target);
     }
 
     public float getMass() {
@@ -35,5 +33,9 @@ public class Agent : MonoBehaviour {
 
     public float getMaxForce() {
         return maxForce;
+    }
+
+    public float getSlowingRadius() {
+        return slowingRadius;
     }
 }
