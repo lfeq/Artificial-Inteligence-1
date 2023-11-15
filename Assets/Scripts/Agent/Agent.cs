@@ -8,6 +8,8 @@ public class Agent : MonoBehaviour {
     [SerializeField] private float maxForce = 5;
     [SerializeField] private float slowingRadius = 5;
     [SerializeField] private Transform target;
+    [SerializeField] private float eyeRadius;
+    [SerializeField] private Transform eyePosition;
 
     private Rigidbody rb;
 
@@ -37,5 +39,13 @@ public class Agent : MonoBehaviour {
 
     public float getSlowingRadius() {
         return slowingRadius;
+    }
+
+    public float getEyeRadius() {
+        return eyeRadius;
+    }
+
+    public Vector3 getEyePosition() {
+        return eyePosition.position;
     }
 }
