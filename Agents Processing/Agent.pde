@@ -134,7 +134,7 @@ class Agent {
     ArrayList<PVector> nodes = path.getNodes();
     target = nodes.get(currentNode);
     if (PVector.dist(target, currentPosition) < pathRadius){
-      currentNode += pathDirection;;
+      currentNode += pathDirection;
       if(currentNode >= nodes.size() || currentNode < 0){
         pathDirection *= -1;
         currentNode += pathDirection;
