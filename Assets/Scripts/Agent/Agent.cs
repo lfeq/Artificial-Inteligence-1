@@ -28,6 +28,11 @@ public class Agent : MonoBehaviour {
         currentNodeInPath = 0;
     }
 
+    private void OnDrawGizmos() {
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(eyePosition.transform.position, eyeRadius);
+    }
+
     public float getMass() {
         return rb.mass;
     }
