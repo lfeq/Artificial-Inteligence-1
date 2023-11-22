@@ -4,6 +4,7 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class Agent : MonoBehaviour {
     [HideInInspector] public int currentNodeInPath, pathDirection = 1;
+    [HideInInspector] public float wanderAngle = 0.5f;
 
     [SerializeField] private float maxSpeed = 5;
     [SerializeField] private float maxForce = 5;
@@ -20,6 +21,7 @@ public class Agent : MonoBehaviour {
         separationRadius = 5, maxSeparation = 5;
 
     [SerializeField] private Agent[] neighbourAgents;
+    [SerializeField] private float angleChange = 5;
 
     private Rigidbody rb;
 
@@ -61,7 +63,7 @@ public class Agent : MonoBehaviour {
         return eyePosition.position;
     }
 
-    public float getCicleDistance() {
+    public float getCircleDistance() {
         return circleDistance;
     }
 
@@ -95,5 +97,9 @@ public class Agent : MonoBehaviour {
 
     public float getMaxSeparation() {
         return maxSeparation;
+    }
+
+    public float getAngleChange() {
+        return angleChange;
     }
 }

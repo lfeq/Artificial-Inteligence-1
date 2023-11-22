@@ -17,10 +17,6 @@ public class MeleeAgent : MonoBehaviour {
         rb = GetComponent<Rigidbody>();
     }
 
-    // Update is called once per frame
-    private void Update() {
-    }
-
     private void FixedUpdate() {
         perceptionManager();
         decisonManager();
@@ -51,9 +47,14 @@ public class MeleeAgent : MonoBehaviour {
             meleeState = MeleeAgentState.Seeking;
         } else if (minDistance < attackRange) {
             meleeState = MeleeAgentState.Attacking;
+        } else {
+            meleeState = MeleeAgentState.Wandering;
         }
         switch (meleeState) {
             case MeleeAgentState.None:
+                break;
+            case MeleeAgentState.Wandering:
+                movementManager();
                 break;
             case MeleeAgentState.Seeking:
                 movementManager();
@@ -67,6 +68,9 @@ public class MeleeAgent : MonoBehaviour {
     private void movementManager() {
         switch (meleeState) {
             case MeleeAgentState.None:
+                break;
+            case MeleeAgentState.Wandering:
+                rb.velocity = SteeringBehavior.wander(agent);
                 break;
             case MeleeAgentState.Seeking:
                 rb.velocity = SteeringBehavior.seek(agent, target.position);
@@ -91,6 +95,7 @@ public class MeleeAgent : MonoBehaviour {
     public enum MeleeAgentState {
         None,
         Seeking,
+        Wandering,
         Attacking,
     }
 }

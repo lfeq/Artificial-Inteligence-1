@@ -127,4 +127,21 @@ public class SteeringBehavior {
             rb.velocity = seek(tempAgent, neighbours[i - 1].transform.position);
         }
     }
+
+    public static Vector3 wander(Agent t_agent) {
+        Vector3 circleCenter = t_agent.getCurrentVelocity();
+        circleCenter.Normalize();
+        circleCenter *= t_agent.getCircleDistance();
+        Vector3 displacement = new Vector3(0, 0, -1);
+        displacement *= t_agent.getCircleRadius();
+        float displacementMagnitud = displacement.magnitude;
+        float angleChange = t_agent.getAngleChange();
+        displacement.x = Mathf.Cos(t_agent.wanderAngle) * displacementMagnitud;
+        displacement.y = Mathf.Sin(t_agent.wanderAngle) * displacementMagnitud;
+        t_agent.wanderAngle += Random.value * angleChange - angleChange * 0.5f;
+        Vector3 wanderForce = circleCenter + displacement;
+        wanderForce = Vector3.ClampMagnitude(wanderForce, t_agent.getMaxSpeed());
+        wanderForce /= t_agent.getMass();
+        return Vector3.ClampMagnitude((t_agent.getCurrentVelocity() + wanderForce), t_agent.getMaxSpeed());
+    }
 }
