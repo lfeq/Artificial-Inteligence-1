@@ -11,7 +11,6 @@ public class MeleeAgent : MonoBehaviour {
     private Transform target;
     private Rigidbody rb;
 
-    // Start is called before the first frame update
     private void Start() {
         agent = GetComponent<Agent>();
         rb = GetComponent<Rigidbody>();
@@ -23,8 +22,29 @@ public class MeleeAgent : MonoBehaviour {
     }
 
     private void perceptionManager() {
+        // Sight
         enemiesPercibed.Clear();
         Collider[] percibed = Physics.OverlapSphere(agent.getEyePosition(), agent.getEyeRadius());
+        RaycastHit hit;
+        foreach (Collider col in percibed) {
+            if (col.CompareTag("Enemy")) {
+                enemiesPercibed.Add(col.gameObject);
+            }
+        }
+        // Hearing
+        percibed = Physics.OverlapSphere(agent.getEarsPosition(), agent.getHearingRadius());
+        foreach (Collider col in percibed) {
+            if (col.CompareTag("Enemy")) {
+                Vector3 directionToEnemy = col.transform.position - agent.getEarsPosition();
+                if (Physics.Raycast(agent.getEarsPosition(), directionToEnemy, out hit, agent.getHearingRadius())) {
+                    if (hit.collider == col) {
+                        enemiesPercibed.Add(col.gameObject);
+                    }
+                }
+            }
+        }
+        // Tact
+        percibed = Physics.OverlapSphere(agent.getTactPosition(), agent.getTactRadius());
         foreach (Collider col in percibed) {
             if (col.CompareTag("Enemy")) {
                 enemiesPercibed.Add(col.gameObject);

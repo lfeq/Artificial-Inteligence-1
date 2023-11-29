@@ -22,6 +22,10 @@ public class Agent : MonoBehaviour {
 
     [SerializeField] private Agent[] neighbourAgents;
     [SerializeField] private float angleChange = 5;
+    [SerializeField, Header("Hearing")] private float hearingRadius = 5;
+    [SerializeField] private Transform earPositions;
+    [SerializeField, Header("Tact")] private float tactRadius = 5;
+    [SerializeField] private Transform tactPosition;
 
     private Rigidbody rb;
 
@@ -32,7 +36,11 @@ public class Agent : MonoBehaviour {
 
     private void OnDrawGizmos() {
         Gizmos.color = Color.green;
-        Gizmos.DrawWireSphere(eyePosition.transform.position, eyeRadius);
+        Gizmos.DrawWireSphere(eyePosition.position, eyeRadius);
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireSphere(earPositions.position, hearingRadius);
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(tactPosition.position, tactRadius);
     }
 
     public float getMass() {
@@ -101,5 +109,21 @@ public class Agent : MonoBehaviour {
 
     public float getAngleChange() {
         return angleChange;
+    }
+
+    public float getHearingRadius() {
+        return hearingRadius;
+    }
+
+    public Vector3 getEarsPosition() {
+        return earPositions.position;
+    }
+
+    public float getTactRadius() {
+        return tactRadius;
+    }
+
+    public Vector3 getTactPosition() {
+        return tactPosition.position;
     }
 }
