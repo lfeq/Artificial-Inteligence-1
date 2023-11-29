@@ -2,12 +2,13 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Agent))]
-public class MeleeAgent : MonoBehaviour {
+public class RangeAgent : MonoBehaviour {
     [SerializeField] private float attackRange = 4, attackCooldown = 0.5f;
+    [SerializeField, Header("Debugging")] private Color attackRangeColor = Color.white;
 
     private Agent agent;
     private List<GameObject> enemiesPercibed = new List<GameObject>();
-    private MeleeAgentState meleeState;
+    private RangeAgentState rangeState;
     private Transform target;
     private Rigidbody rb;
     private Animator animator;
@@ -26,6 +27,11 @@ public class MeleeAgent : MonoBehaviour {
     private void FixedUpdate() {
         perceptionManager();
         decisonManager();
+    }
+
+    private void OnDrawGizmos() {
+        Gizmos.color = attackRangeColor;
+        Gizmos.DrawWireSphere(transform.position, attackRange);
     }
 
     private void perceptionManager() {
@@ -74,66 +80,66 @@ public class MeleeAgent : MonoBehaviour {
         }
         target = enemiesPercibed[closestEnemy].transform;
         if (minDistance > attackRange) {
-            meleeState = MeleeAgentState.Seeking;
+            rangeState = RangeAgentState.Seeking;
         } else if (minDistance < attackRange) {
-            meleeState = MeleeAgentState.Attacking;
+            rangeState = RangeAgentState.Attacking;
         } else {
-            meleeState = MeleeAgentState.None;
+            rangeState = RangeAgentState.None;
         }
-        switch (meleeState) {
-            case MeleeAgentState.None:
+        switch (rangeState) {
+            case RangeAgentState.None:
                 break;
-            case MeleeAgentState.Wandering:
+            case RangeAgentState.Wandering:
                 movementManager();
                 break;
-            case MeleeAgentState.Seeking:
+            case RangeAgentState.Seeking:
                 movementManager();
                 break;
-            case MeleeAgentState.Attacking:
+            case RangeAgentState.Attacking:
                 actionManager();
                 break;
         }
     }
 
     private void movementManager() {
-        switch (meleeState) {
-            case MeleeAgentState.None:
+        switch (rangeState) {
+            case RangeAgentState.None:
                 animationManager();
                 break;
-            case MeleeAgentState.Wandering:
+            case RangeAgentState.Wandering:
                 animationManager();
                 rb.velocity = SteeringBehavior.wander(agent);
                 break;
-            case MeleeAgentState.Seeking:
+            case RangeAgentState.Seeking:
                 animationManager();
                 rb.velocity = SteeringBehavior.seek(agent, target.position);
                 break;
-            case MeleeAgentState.Attacking:
+            case RangeAgentState.Attacking:
                 break;
         }
     }
 
     private void actionManager() {
-        switch (meleeState) {
-            case MeleeAgentState.None:
+        switch (rangeState) {
+            case RangeAgentState.None:
                 break;
-            case MeleeAgentState.Seeking:
+            case RangeAgentState.Seeking:
                 break;
-            case MeleeAgentState.Attacking:
+            case RangeAgentState.Attacking:
                 attack();
                 break;
         }
     }
 
     private void animationManager() {
-        switch (meleeState) {
-            case MeleeAgentState.None:
+        switch (rangeState) {
+            case RangeAgentState.None:
                 animator.SetBool("IsMoving", false);
                 break;
-            case MeleeAgentState.Seeking:
+            case RangeAgentState.Seeking:
                 animator.SetBool("IsMoving", true);
                 break;
-            case MeleeAgentState.Attacking:
+            case RangeAgentState.Attacking:
                 animator.SetTrigger("Attack");
                 break;
         }
@@ -147,7 +153,7 @@ public class MeleeAgent : MonoBehaviour {
         animationManager();
     }
 
-    public enum MeleeAgentState {
+    public enum RangeAgentState {
         None,
         Seeking,
         Wandering,

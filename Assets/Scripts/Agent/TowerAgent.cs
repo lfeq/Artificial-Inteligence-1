@@ -5,6 +5,7 @@ using UnityEngine;
 public class TowerAgent : MonoBehaviour {
     [SerializeField] private GameObject bulletPrefab;
     [SerializeField] private Transform bulletSpawnPoint;
+    [SerializeField] private float shootCooldown = 2f;
 
     private float attackRange;
     private Agent agent;
@@ -12,11 +13,18 @@ public class TowerAgent : MonoBehaviour {
     private TowerAgentState towerState;
     private Transform target;
     private Rigidbody rb;
+    private float shootTimer = 0;
 
     private void Start() {
         agent = GetComponent<Agent>();
         rb = GetComponent<Rigidbody>();
         attackRange = agent.getEyeRadius();
+    }
+
+    private void Update() {
+        shootTimer -= Time.deltaTime;
+        if (shootTimer < 0) {
+        }
     }
 
     private void FixedUpdate() {
@@ -72,9 +80,13 @@ public class TowerAgent : MonoBehaviour {
     }
 
     private void shoot() {
+        if (shootTimer > 0) {
+            return;
+        }
         GameObject tempBullet = Instantiate(bulletPrefab, bulletSpawnPoint.position, Quaternion.identity);
         BulletAgent bulletAgent = tempBullet.GetComponent<BulletAgent>();
         bulletAgent.setTarget(target);
+        shootTimer = shootCooldown;
     }
 
     public enum TowerAgentState {

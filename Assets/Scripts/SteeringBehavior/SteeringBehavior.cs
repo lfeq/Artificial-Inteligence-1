@@ -11,7 +11,7 @@ public class SteeringBehavior {
         Vector3 desiredVelocity = t_target - t_agent.transform.position;
         desiredVelocity.Normalize();
         desiredVelocity *= maxSpeed;
-        desiredVelocity = arrival(t_agent, t_target, desiredVelocity);
+        //desiredVelocity = arrival(t_agent, t_target, desiredVelocity);
         Vector3 steeringForce = desiredVelocity - currentSpeed;
         steeringForce = Vector3.ClampMagnitude(steeringForce, maxForce);
         steeringForce /= mass;
