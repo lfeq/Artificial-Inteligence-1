@@ -1,10 +1,14 @@
 using System.Collections.Generic;
+using Unity.Burst.CompilerServices;
 using UnityEngine;
+using static MeleeAgent;
 
 [RequireComponent(typeof(Agent))]
 public class RangeAgent : MonoBehaviour {
+    [SerializeField] private string enemyTag = "Enemy";
     [SerializeField] private float attackRange = 4, attackCooldown = 0.5f;
     [SerializeField, Header("Debugging")] private Color attackRangeColor = Color.white;
+    [SerializeField] private Transform mainTarget;
 
     private Agent agent;
     private List<GameObject> enemiesPercibed = new List<GameObject>();
@@ -13,6 +17,8 @@ public class RangeAgent : MonoBehaviour {
     private Rigidbody rb;
     private Animator animator;
     private float attackTimer;
+
+    #region Unity Functions
 
     private void Start() {
         agent = GetComponent<Agent>();
@@ -34,20 +40,24 @@ public class RangeAgent : MonoBehaviour {
         Gizmos.DrawWireSphere(transform.position, attackRange);
     }
 
+    #endregion Unity Functions
+
+    #region Class Private Functions
+
     private void perceptionManager() {
         // Sight
         enemiesPercibed.Clear();
         Collider[] percibed = Physics.OverlapSphere(agent.getEyePosition(), agent.getEyeRadius());
         RaycastHit hit;
         foreach (Collider col in percibed) {
-            if (col.CompareTag("Enemy")) {
+            if (col.CompareTag(enemyTag)) {
                 enemiesPercibed.Add(col.gameObject);
             }
         }
         // Hearing
         percibed = Physics.OverlapSphere(agent.getEarsPosition(), agent.getHearingRadius());
         foreach (Collider col in percibed) {
-            if (col.CompareTag("Enemy")) {
+            if (col.CompareTag(enemyTag)) {
                 Vector3 directionToEnemy = col.transform.position - agent.getEarsPosition();
                 if (Physics.Raycast(agent.getEarsPosition(), directionToEnemy, out hit, agent.getHearingRadius())) {
                     if (hit.collider == col) {
@@ -59,35 +69,38 @@ public class RangeAgent : MonoBehaviour {
         // Tact
         percibed = Physics.OverlapSphere(agent.getTactPosition(), agent.getTactRadius());
         foreach (Collider col in percibed) {
-            if (col.CompareTag("Enemy")) {
+            if (col.CompareTag(enemyTag)) {
                 enemiesPercibed.Add(col.gameObject);
             }
         }
     }
 
     private void decisonManager() {
-        if (enemiesPercibed.Count <= 0) {
-            return;
-        }
         int closestEnemy = 0;
         float minDistance = 1000f;
-        for (int i = 0; i < enemiesPercibed.Count; i++) {
-            float distanceToEnemy = Vector3.Distance(transform.position, enemiesPercibed[i].transform.position);
-            if (distanceToEnemy < minDistance) {
-                closestEnemy = i;
-                minDistance = distanceToEnemy;
+        if (enemiesPercibed.Count > 0) {
+            for (int i = 0; i < enemiesPercibed.Count; i++) {
+                float distanceToEnemy = Vector3.Distance(transform.position, enemiesPercibed[i].transform.position);
+                if (distanceToEnemy < minDistance) {
+                    closestEnemy = i;
+                    minDistance = distanceToEnemy;
+                }
             }
+            target = enemiesPercibed[closestEnemy].transform;
         }
-        target = enemiesPercibed[closestEnemy].transform;
         if (minDistance > attackRange) {
             rangeState = RangeAgentState.Seeking;
-        } else if (minDistance < attackRange) {
+        }
+        if (minDistance < attackRange) {
             rangeState = RangeAgentState.Attacking;
-        } else {
-            rangeState = RangeAgentState.None;
+        }
+        if (enemiesPercibed.Count == 0) {
+            rangeState = RangeAgentState.Seeking;
+            target = mainTarget;
         }
         switch (rangeState) {
             case RangeAgentState.None:
+                movementManager();
                 break;
             case RangeAgentState.Wandering:
                 movementManager();
@@ -108,11 +121,12 @@ public class RangeAgent : MonoBehaviour {
                 break;
             case RangeAgentState.Wandering:
                 animationManager();
-                rb.velocity = SteeringBehavior.wander(agent);
+                rb.velocity = SteeringBehaviours.wander(agent);
                 break;
             case RangeAgentState.Seeking:
                 animationManager();
-                rb.velocity = SteeringBehavior.seek(agent, target.position);
+                rb.velocity = SteeringBehaviours.seek(agent, target.position);
+                transform.LookAt(target.position);
                 break;
             case RangeAgentState.Attacking:
                 break;
@@ -152,6 +166,8 @@ public class RangeAgent : MonoBehaviour {
         attackTimer = attackCooldown;
         animationManager();
     }
+
+    #endregion Class Private Functions
 
     public enum RangeAgentState {
         None,

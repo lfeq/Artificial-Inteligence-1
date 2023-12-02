@@ -3,6 +3,7 @@ using UnityEngine;
 
 [RequireComponent(typeof(Agent))]
 public class TowerAgent : MonoBehaviour {
+    [SerializeField] private string enemyTag = "Enemy";
     [SerializeField] private GameObject bulletPrefab;
     [SerializeField] private Transform bulletSpawnPoint;
     [SerializeField] private float shootCooldown = 2f;
@@ -37,7 +38,7 @@ public class TowerAgent : MonoBehaviour {
         enemiesPercibed.Clear();
         Collider[] percibed = Physics.OverlapSphere(agent.getEyePosition(), agent.getEyeRadius());
         foreach (Collider col in percibed) {
-            if (col.CompareTag("Enemy")) {
+            if (col.CompareTag(enemyTag)) {
                 enemiesPercibed.Add(col.gameObject);
             }
         }

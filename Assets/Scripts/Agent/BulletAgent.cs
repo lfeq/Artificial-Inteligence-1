@@ -12,7 +12,7 @@ public class BulletAgent : MonoBehaviour {
     }
 
     private void FixedUpdate() {
-        rb.velocity = SteeringBehavior.seek(agent, target.position);
+        rb.velocity = SteeringBehaviours.seek(agent, target.position);
     }
 
     public void setTarget(Transform t_target) {

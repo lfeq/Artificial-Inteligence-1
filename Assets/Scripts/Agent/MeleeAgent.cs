@@ -3,7 +3,9 @@ using UnityEngine;
 
 [RequireComponent(typeof(Agent))]
 public class MeleeAgent : MonoBehaviour {
+    [SerializeField] private string enemyTag = "Enemy";
     [SerializeField] private float attackRange = 4, attackCooldown = 0.5f;
+    [SerializeField] private Transform mainTarget;
 
     private Agent agent;
     private List<GameObject> enemiesPercibed = new List<GameObject>();
@@ -34,14 +36,14 @@ public class MeleeAgent : MonoBehaviour {
         Collider[] percibed = Physics.OverlapSphere(agent.getEyePosition(), agent.getEyeRadius());
         RaycastHit hit;
         foreach (Collider col in percibed) {
-            if (col.CompareTag("Enemy")) {
+            if (col.CompareTag(enemyTag)) {
                 enemiesPercibed.Add(col.gameObject);
             }
         }
         // Hearing
         percibed = Physics.OverlapSphere(agent.getEarsPosition(), agent.getHearingRadius());
         foreach (Collider col in percibed) {
-            if (col.CompareTag("Enemy")) {
+            if (col.CompareTag(enemyTag)) {
                 Vector3 directionToEnemy = col.transform.position - agent.getEarsPosition();
                 if (Physics.Raycast(agent.getEarsPosition(), directionToEnemy, out hit, agent.getHearingRadius())) {
                     if (hit.collider == col) {
@@ -53,35 +55,38 @@ public class MeleeAgent : MonoBehaviour {
         // Tact
         percibed = Physics.OverlapSphere(agent.getTactPosition(), agent.getTactRadius());
         foreach (Collider col in percibed) {
-            if (col.CompareTag("Enemy")) {
+            if (col.CompareTag(enemyTag)) {
                 enemiesPercibed.Add(col.gameObject);
             }
         }
     }
 
     private void decisonManager() {
-        if (enemiesPercibed.Count <= 0) {
-            return;
-        }
         int closestEnemy = 0;
         float minDistance = 1000f;
-        for (int i = 0; i < enemiesPercibed.Count; i++) {
-            float distanceToEnemy = Vector3.Distance(transform.position, enemiesPercibed[i].transform.position);
-            if (distanceToEnemy < minDistance) {
-                closestEnemy = i;
-                minDistance = distanceToEnemy;
+        if (enemiesPercibed.Count > 0) {
+            for (int i = 0; i < enemiesPercibed.Count; i++) {
+                float distanceToEnemy = Vector3.Distance(transform.position, enemiesPercibed[i].transform.position);
+                if (distanceToEnemy < minDistance) {
+                    closestEnemy = i;
+                    minDistance = distanceToEnemy;
+                }
             }
+            target = enemiesPercibed[closestEnemy].transform;
         }
-        target = enemiesPercibed[closestEnemy].transform;
         if (minDistance > attackRange) {
             meleeState = MeleeAgentState.Seeking;
-        } else if (minDistance < attackRange) {
+        }
+        if (minDistance < attackRange) {
             meleeState = MeleeAgentState.Attacking;
-        } else {
-            meleeState = MeleeAgentState.None;
+        }
+        if (enemiesPercibed.Count == 0) {
+            meleeState = MeleeAgentState.Seeking;
+            target = mainTarget;
         }
         switch (meleeState) {
             case MeleeAgentState.None:
+                movementManager();
                 break;
             case MeleeAgentState.Wandering:
                 movementManager();
@@ -102,11 +107,12 @@ public class MeleeAgent : MonoBehaviour {
                 break;
             case MeleeAgentState.Wandering:
                 animationManager();
-                rb.velocity = SteeringBehavior.wander(agent);
+                rb.velocity = SteeringBehaviours.wander(agent);
                 break;
             case MeleeAgentState.Seeking:
                 animationManager();
-                rb.velocity = SteeringBehavior.seek(agent, target.position);
+                rb.velocity = SteeringBehaviours.seek(agent, target.position);
+                transform.LookAt(target.position);
                 break;
             case MeleeAgentState.Attacking:
                 break;

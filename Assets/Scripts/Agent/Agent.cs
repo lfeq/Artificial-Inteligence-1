@@ -6,22 +6,22 @@ public class Agent : MonoBehaviour {
     [HideInInspector] public int currentNodeInPath, pathDirection = 1;
     [HideInInspector] public float wanderAngle = 0.5f;
 
-    [SerializeField] private float maxSpeed = 5;
+    [SerializeField, Header("Movement")] private float maxSpeed = 5;
     [SerializeField] private float maxForce = 5;
     [SerializeField] private float slowingRadius = 5;
     [SerializeField] private float circleDistance = 5, cirlceRadius = 5;
     [SerializeField] private Transform target;
-    [SerializeField] private float eyeRadius;
+    [SerializeField, Header("Sight")] private float eyeRadius;
     [SerializeField] private Transform eyePosition;
-    [SerializeField] private List<Transform> nodes = new List<Transform>();
+    [SerializeField, Header("Path Following")] private List<Transform> nodes = new List<Transform>();
     [SerializeField] private float pathRadius = 5;
 
-    [SerializeField]
+    [SerializeField, Header("Follow Leader")]
     private float leaderBehindDistance = 5, leaderSightRadius = 5,
         separationRadius = 5, maxSeparation = 5;
 
     [SerializeField] private Agent[] neighbourAgents;
-    [SerializeField] private float angleChange = 5;
+    [SerializeField, Header("Wander")] private float angleChange = 5;
     [SerializeField, Header("Hearing")] private float hearingRadius = 5;
     [SerializeField] private Transform earPositions;
     [SerializeField, Header("Tact")] private float tactRadius = 5;
