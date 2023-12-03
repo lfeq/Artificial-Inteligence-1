@@ -1,14 +1,22 @@
 using System.Collections.Generic;
-using Unity.Burst.CompilerServices;
 using UnityEngine;
-using static MeleeAgent;
 
+/// <summary>
+/// RangeAgent class represents an agent that engages in range combat.
+/// </summary>
 [RequireComponent(typeof(Agent))]
 public class RangeAgent : MonoBehaviour {
+
+    #region Serializable variables
+
     [SerializeField] private string enemyTag = "Enemy";
     [SerializeField] private float attackRange = 4, attackCooldown = 0.5f;
     [SerializeField, Header("Debugging")] private Color attackRangeColor = Color.white;
     [SerializeField] private Transform mainTarget;
+
+    #endregion Serializable variables
+
+    #region Private variables
 
     private Agent agent;
     private List<GameObject> enemiesPercibed = new List<GameObject>();
@@ -17,6 +25,8 @@ public class RangeAgent : MonoBehaviour {
     private Rigidbody rb;
     private Animator animator;
     private float attackTimer;
+
+    #endregion Private variables
 
     #region Unity Functions
 
@@ -44,6 +54,9 @@ public class RangeAgent : MonoBehaviour {
 
     #region Class Private Functions
 
+    /// <summary>
+    /// Manages the perception of enemies through sight, hearing, and tact.
+    /// </summary>
     private void perceptionManager() {
         // Sight
         enemiesPercibed.Clear();
@@ -75,6 +88,9 @@ public class RangeAgent : MonoBehaviour {
         }
     }
 
+    /// <summary>
+    /// Manages AI decision-making based on perceived enemies.
+    /// </summary>
     private void decisonManager() {
         int closestEnemy = 0;
         float minDistance = 1000f;
@@ -114,6 +130,9 @@ public class RangeAgent : MonoBehaviour {
         }
     }
 
+    /// <summary>
+    /// Manages movement based on the current AI state.
+    /// </summary>
     private void movementManager() {
         switch (rangeState) {
             case RangeAgentState.None:
@@ -133,6 +152,9 @@ public class RangeAgent : MonoBehaviour {
         }
     }
 
+    /// <summary>
+    /// Manages actions based on the current AI state.
+    /// </summary>
     private void actionManager() {
         switch (rangeState) {
             case RangeAgentState.None:
@@ -145,6 +167,9 @@ public class RangeAgent : MonoBehaviour {
         }
     }
 
+    /// <summary>
+    /// Manages animations based on the current AI state.
+    /// </summary>
     private void animationManager() {
         switch (rangeState) {
             case RangeAgentState.None:
@@ -159,6 +184,9 @@ public class RangeAgent : MonoBehaviour {
         }
     }
 
+    /// <summary>
+    /// Initiates an attack if the attack timer allows it.
+    /// </summary>
     private void attack() {
         if (attackTimer > 0) {
             return;
@@ -169,10 +197,17 @@ public class RangeAgent : MonoBehaviour {
 
     #endregion Class Private Functions
 
+    #region Enums
+
+    /// <summary>
+    /// Enumeration representing different states of the RangeAgent.
+    /// </summary>
     public enum RangeAgentState {
         None,
         Seeking,
         Wandering,
         Attacking,
     }
+
+    #endregion Enums
 }

@@ -1,11 +1,21 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// MeleeAgent class represents an agent that engages in melee combat.
+/// </summary>
 [RequireComponent(typeof(Agent))]
 public class MeleeAgent : MonoBehaviour {
+
+    #region Serializable variables
+
     [SerializeField] private string enemyTag = "Enemy";
     [SerializeField] private float attackRange = 4, attackCooldown = 0.5f;
     [SerializeField] private Transform mainTarget;
+
+    #endregion Serializable variables
+
+    #region Private variables
 
     private Agent agent;
     private List<GameObject> enemiesPercibed = new List<GameObject>();
@@ -14,6 +24,10 @@ public class MeleeAgent : MonoBehaviour {
     private Rigidbody rb;
     private Animator animator;
     private float attackTimer;
+
+    #endregion Private variables
+
+    #region Unity functions
 
     private void Start() {
         agent = GetComponent<Agent>();
@@ -30,6 +44,13 @@ public class MeleeAgent : MonoBehaviour {
         decisonManager();
     }
 
+    #endregion Unity functions
+
+    #region Private functions
+
+    /// <summary>
+    /// Manages the perception of enemies through sight, hearing, and tact.
+    /// </summary>
     private void perceptionManager() {
         // Sight
         enemiesPercibed.Clear();
@@ -61,6 +82,9 @@ public class MeleeAgent : MonoBehaviour {
         }
     }
 
+    /// <summary>
+    /// Manages AI decision-making based on perceived enemies.
+    /// </summary>
     private void decisonManager() {
         int closestEnemy = 0;
         float minDistance = 1000f;
@@ -100,6 +124,9 @@ public class MeleeAgent : MonoBehaviour {
         }
     }
 
+    /// <summary>
+    /// Manages movement based on the current AI state.
+    /// </summary>
     private void movementManager() {
         switch (meleeState) {
             case MeleeAgentState.None:
@@ -119,6 +146,9 @@ public class MeleeAgent : MonoBehaviour {
         }
     }
 
+    /// <summary>
+    /// Manages actions based on the current AI state.
+    /// </summary>
     private void actionManager() {
         switch (meleeState) {
             case MeleeAgentState.None:
@@ -131,6 +161,9 @@ public class MeleeAgent : MonoBehaviour {
         }
     }
 
+    /// <summary>
+    /// Manages animations based on the current AI state.
+    /// </summary>
     private void animationManager() {
         switch (meleeState) {
             case MeleeAgentState.None:
@@ -145,6 +178,9 @@ public class MeleeAgent : MonoBehaviour {
         }
     }
 
+    /// <summary>
+    /// Initiates an attack if the attack timer allows it.
+    /// </summary>
     private void attack() {
         if (attackTimer > 0) {
             return;
@@ -153,10 +189,19 @@ public class MeleeAgent : MonoBehaviour {
         animationManager();
     }
 
+    #endregion Private functions
+
+    #region Enums
+
+    /// <summary>
+    /// Enumeration representing different states of the MeleeAgent.
+    /// </summary>
     public enum MeleeAgentState {
         None,
         Seeking,
         Wandering,
         Attacking,
     }
+
+    #endregion Enums
 }
