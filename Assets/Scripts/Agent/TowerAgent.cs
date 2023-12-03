@@ -1,12 +1,22 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// TowerAgent class represents an agent that behaves like a tower.
+/// </summary>
 [RequireComponent(typeof(Agent))]
 public class TowerAgent : MonoBehaviour {
+
+    #region Serializable variables
+
     [SerializeField] private string enemyTag = "Enemy";
     [SerializeField] private GameObject bulletPrefab;
     [SerializeField] private Transform bulletSpawnPoint;
     [SerializeField] private float shootCooldown = 2f;
+
+    #endregion Serializable variables
+
+    #region Private variables
 
     private float attackRange;
     private Agent agent;
@@ -15,6 +25,10 @@ public class TowerAgent : MonoBehaviour {
     private Transform target;
     private Rigidbody rb;
     private float shootTimer = 0;
+
+    #endregion Private variables
+
+    #region Unity functions
 
     private void Start() {
         agent = GetComponent<Agent>();
@@ -33,6 +47,13 @@ public class TowerAgent : MonoBehaviour {
         decisonManager();
     }
 
+    #endregion Unity functions
+
+    #region Private functions
+
+    /// <summary>
+    /// Manages the perception of enemies through sight.
+    /// </summary>
     private void perceptionManager() {
         // Sight
         enemiesPercibed.Clear();
@@ -44,6 +65,9 @@ public class TowerAgent : MonoBehaviour {
         }
     }
 
+    /// <summary>
+    /// Manages AI decision-making based on perceived enemies.
+    /// </summary>
     private void decisonManager() {
         if (enemiesPercibed.Count == 0) {
             return;
@@ -72,6 +96,9 @@ public class TowerAgent : MonoBehaviour {
         }
     }
 
+    /// <summary>
+    /// Manages movement based on the current AI state.
+    /// </summary>
     private void actionManager() {
         switch (towerState) {
             case TowerAgentState.Attacking:
@@ -80,6 +107,9 @@ public class TowerAgent : MonoBehaviour {
         }
     }
 
+    /// <summary>
+    /// Initiates an attack if the attack timer allows it.
+    /// </summary>
     private void shoot() {
         if (shootTimer > 0) {
             return;
@@ -90,8 +120,17 @@ public class TowerAgent : MonoBehaviour {
         shootTimer = shootCooldown;
     }
 
+    #endregion Private functions
+
+    #region Enums
+
+    /// <summary>
+    /// Enumeration representing different states of the TowerAgent.
+    /// </summary>
     public enum TowerAgentState {
         None,
         Attacking,
     }
+
+    #endregion Enums
 }

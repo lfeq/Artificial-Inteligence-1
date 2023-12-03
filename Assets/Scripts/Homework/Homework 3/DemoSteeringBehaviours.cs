@@ -1,5 +1,8 @@
 using UnityEngine;
 
+/// <summary>
+/// Demonstrates various steering behaviors for an agent in a Unity scene.
+/// </summary>
 [RequireComponent(typeof(Agent))]
 public class DemoSteeringBehaviours : MonoBehaviour {
 
@@ -56,6 +59,9 @@ public class DemoSteeringBehaviours : MonoBehaviour {
 
     #region Enums
 
+    /// <summary>
+    /// Enumeration of steering behavior states.
+    /// </summary>
     public enum SteeringBehaviourState {
         seek,
         flee,
