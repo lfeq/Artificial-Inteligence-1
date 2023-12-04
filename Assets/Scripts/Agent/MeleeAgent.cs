@@ -12,6 +12,7 @@ public class MeleeAgent : MonoBehaviour {
     [SerializeField] private string enemyTag = "Enemy";
     [SerializeField] private float attackRange = 4, attackCooldown = 0.5f;
     [SerializeField] private Transform mainTarget;
+    [SerializeField, Header("Debugging")] private Color attackRangeColor;
 
     #endregion Serializable variables
 
@@ -42,6 +43,11 @@ public class MeleeAgent : MonoBehaviour {
     private void FixedUpdate() {
         perceptionManager();
         decisonManager();
+    }
+
+    private void OnDrawGizmos() {
+        Gizmos.color = attackRangeColor;
+        Gizmos.DrawWireSphere(transform.position, attackRange);
     }
 
     #endregion Unity functions
@@ -156,6 +162,7 @@ public class MeleeAgent : MonoBehaviour {
             case MeleeAgentState.Seeking:
                 break;
             case MeleeAgentState.Attacking:
+                rb.velocity = Vector3.zero;
                 attack();
                 break;
         }

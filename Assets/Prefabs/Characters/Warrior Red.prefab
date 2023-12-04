@@ -510,9 +510,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemyTag: Blue
-  attackRange: 4
+  attackRange: 3
   attackCooldown: 0.7
   mainTarget: {fileID: 0}
+  attackRangeColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &1034461108079842081
 GameObject:
   m_ObjectHideFlags: 0
