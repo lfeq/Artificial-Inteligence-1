@@ -25,6 +25,12 @@ public class BulletAgent : MonoBehaviour {
         rb.velocity = SteeringBehaviours.seek(agent, target.position);
     }
 
+    private void OnTriggerEnter(Collider other) {
+        if (other.gameObject == target.gameObject) {
+            Destroy(gameObject);
+        }
+    }
+
     #endregion Unity functions
 
     #region Public functions

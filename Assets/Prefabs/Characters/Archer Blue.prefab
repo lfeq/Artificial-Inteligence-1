@@ -944,13 +944,14 @@ Transform:
   m_GameObject: {fileID: 2679421492183775107}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.79, y: 0, z: -10.02}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5465117921164756290}
   - {fileID: 1255212297790349981}
   - {fileID: 6352189790082509892}
+  - {fileID: 2276085407250388566}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &8475452348681383710
@@ -1171,6 +1172,10 @@ MonoBehaviour:
   enemyTag: Red
   attackRange: 7
   attackCooldown: 0.7
+  mainTarget: {fileID: 0}
+  bulletPrefab: {fileID: 5976350883950134905, guid: e2369d4279b3016499b33058542446f4,
+    type: 3}
+  bulletSpawnPosition: {fileID: 2276085407250388566}
   attackRangeColor: {r: 0.9433962, g: 0.69258404, b: 0, a: 1}
 --- !u!1 &2703370783874962766
 GameObject:
@@ -2447,6 +2452,37 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 435178300408543905}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &7570209758426067925
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2276085407250388566}
+  m_Layer: 0
+  m_Name: BulletSpawnPosition
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2276085407250388566
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7570209758426067925}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.134, y: 1.073, z: 0.543}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6825917783932423050}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7620460914253197908
 GameObject:

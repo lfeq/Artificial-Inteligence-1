@@ -11,8 +11,10 @@ public class RangeAgent : MonoBehaviour {
 
     [SerializeField] private string enemyTag = "Enemy";
     [SerializeField] private float attackRange = 4, attackCooldown = 0.5f;
-    [SerializeField, Header("Debugging")] private Color attackRangeColor = Color.white;
     [SerializeField] private Transform mainTarget;
+    [SerializeField] private GameObject bulletPrefab;
+    [SerializeField] private Transform bulletSpawnPosition;
+    [SerializeField, Header("Debugging")] private Color attackRangeColor = Color.white;
 
     #endregion Serializable variables
 
@@ -51,6 +53,18 @@ public class RangeAgent : MonoBehaviour {
     }
 
     #endregion Unity Functions
+
+    #region Public functions
+
+    /// <summary>
+    /// Spawns a bullet agent at the specified position and sets its target.
+    /// </summary>
+    public void spawnBullet() {
+        BulletAgent tempBullet = Instantiate(bulletPrefab, bulletSpawnPosition.position, Quaternion.identity).GetComponent<BulletAgent>();
+        tempBullet.setTarget(target);
+    }
+
+    #endregion Public functions
 
     #region Class Private Functions
 
