@@ -37,21 +37,8 @@ public class PlayerManager : MonoBehaviour {
             case PlayerState.Running:
                 m_animator.SetBool("isRunning", true);
                 break;
-            case PlayerState.Jump:
-                m_animator.SetBool("isJumpng", true);
-                m_animator.SetFloat("falling", 1);
-                break;
-            case PlayerState.JumpFall:
-                m_animator.SetBool("isFalling", true);
-                m_animator.SetFloat("falling", 0);
-                break;
-            case PlayerState.FreeFall:
-                m_animator.SetBool("isFalling", true);
-                m_animator.SetFloat("falling", 0);
-                break;
-            case PlayerState.Landing:
-                m_animator.SetBool("isLanding", true);
-                m_animator.SetFloat("falling", -1);
+            case PlayerState.Shooting:
+                m_animator.SetTrigger("shoot");
                 break;
             case PlayerState.Dead:
                 break;
@@ -75,9 +62,6 @@ public enum PlayerState {
     None,
     Idle,
     Running,
-    Jump,
-    JumpFall,
-    FreeFall,
     Dead,
-    Landing
+    Shooting,
 }
