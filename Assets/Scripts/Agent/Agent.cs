@@ -23,7 +23,7 @@ public class Agent : MonoBehaviour {
     [SerializeField] private Transform target;
     [SerializeField, Header("Sight")] private float eyeRadius;
     [SerializeField] private Transform eyePosition;
-    [SerializeField, Header("Path Following")] private List<Transform> nodes = new List<Transform>();
+    [SerializeField, Header("Path Following")] private List<Vector3> nodes = new List<Vector3>();
     [SerializeField] private float pathRadius = 5;
 
     [SerializeField, Header("Follow Leader")]
@@ -64,6 +64,10 @@ public class Agent : MonoBehaviour {
     #endregion Unity functions
 
     #region Public functions
+
+    public Transform getTargetTranform() {
+        return target;
+    }
 
     /// <summary>
     /// Gets the mass of the agent.
@@ -141,8 +145,17 @@ public class Agent : MonoBehaviour {
     /// Gets a list of nodes defining the path for path following behavior.
     /// </summary>
     /// <returns>A list of Transform objects representing path nodes.</returns>
-    public List<Transform> getNodes() {
+    public List<Vector3> getNodes() {
+        if (nodes.Count == 0) {
+            nodes = PathFinding.instance.FindPath(transform.position, target.position);
+        }
         return nodes;
+    }
+
+    public void setNodes(List<Vector3> t_nodeList) {
+        nodes.Clear();
+        nodes = t_nodeList;
+        currentNodeInPath = 0;
     }
 
     /// <summary>

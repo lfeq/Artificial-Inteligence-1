@@ -158,8 +158,8 @@ public class RangeAgent : MonoBehaviour {
                 break;
             case RangeAgentState.Seeking:
                 animationManager();
-                rb.velocity = SteeringBehaviours.seek(agent, target.position);
-                transform.LookAt(target.position);
+                rb.velocity = SteeringBehaviours.pathFollowing(agent);
+                transform.LookAt(agent.getTargetTranform().position);
                 break;
             case RangeAgentState.Attacking:
                 break;

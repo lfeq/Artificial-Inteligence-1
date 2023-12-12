@@ -37,7 +37,7 @@ public class DemoSteeringBehaviours : MonoBehaviour {
                 rb.velocity = SteeringBehaviours.flee(agent, target.transform.position);
                 break;
             case SteeringBehaviourState.followPath:
-                rb.velocity = SteeringBehaviours.pathFollowing(agent);
+                rb.velocity = SteeringBehaviours.pathFollowingPatrol(agent);
                 break;
             case SteeringBehaviourState.pursuit:
                 rb.velocity = SteeringBehaviours.pursuit(agent, pursuitTarget);

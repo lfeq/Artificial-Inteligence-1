@@ -71,15 +71,28 @@ public class SteeringBehaviours {
     /// </summary>
     /// <param name="t_agent">The agent following the path.</param>
     /// <returns>The steering force vector for the path following behavior.</returns>
-    public static Vector3 pathFollowing(Agent t_agent) {
+    public static Vector3 pathFollowingPatrol(Agent t_agent) {
         Vector3 target;
-        List<Transform> nodes = t_agent.getNodes();
-        target = nodes[t_agent.currentNodeInPath].position;
+        List<Vector3> nodes = t_agent.getNodes();
+        target = nodes[t_agent.currentNodeInPath];
         if (Vector3.Distance(target, t_agent.transform.position) < t_agent.getPathRadius()) {
             t_agent.currentNodeInPath += t_agent.pathDirection;
             if ((t_agent.currentNodeInPath >= nodes.Count) || (t_agent.currentNodeInPath < 0)) {
                 t_agent.pathDirection *= -1;
                 t_agent.currentNodeInPath += t_agent.pathDirection;
+            }
+        }
+        return seek(t_agent, target, true);
+    }
+
+    public static Vector3 pathFollowing(Agent t_agent) {
+        Vector3 target;
+        List<Vector3> nodes = t_agent.getNodes();
+        target = nodes[t_agent.currentNodeInPath];
+        if (Vector3.Distance(target, t_agent.transform.position) < t_agent.getPathRadius()) {
+            t_agent.currentNodeInPath++;
+            if (t_agent.currentNodeInPath >= nodes.Count) {
+                t_agent.setNodes(PathFinding.instance.FindPath(t_agent.transform.position, t_agent.getTargetTranform().position));
             }
         }
         return seek(t_agent, target, true);
