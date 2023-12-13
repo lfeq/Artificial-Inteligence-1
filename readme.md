@@ -12,9 +12,7 @@ This project implements an artificial intelligence system for a simple top-down 
 6. [Performance](#performance)
 7. [Testing](#testing)
 8. [Future Improvements](#future-improvements)
-9. [Contributing](#contributing)
-10. [Acknowledgments](#acknowledgments)
-11. [License](#license)
+9. [Acknowledgments](#acknowledgments)
 
 ## Introduction
 
@@ -62,10 +60,6 @@ While the project meets the initial requirements, potential improvements could i
 - Enhanced performance optimizations for larger agent counts.
 - Additional AI behaviors or strategies.
 - Bug fixes and general improvements.
-
-## Contributing
-
-Contributions are welcome. If you have suggestions, improvements, or find issues, please open a pull request or submit an issue.
 
 ## Acknowledgments
 
