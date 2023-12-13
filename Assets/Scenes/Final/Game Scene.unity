@@ -11098,7 +11098,6 @@ MonoBehaviour:
   gameOverCanvasGroup: {fileID: 857872148}
   spawnPosition: {x: 0, y: 0}
   player: {fileID: 4669655234024389566, guid: 2e74cd92ba075214f8289a63c78ef228, type: 3}
-  nextLevelName: 
   virtualCamera: {fileID: 912809055}
   victorySound: {fileID: 8300000, guid: 3a821f6bca1318949a075ed3ec96d701, type: 3}
 --- !u!4 &1481907311
