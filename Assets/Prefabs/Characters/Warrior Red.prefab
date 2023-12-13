@@ -269,6 +269,7 @@ GameObject:
   - component: {fileID: 6759977231053557994}
   - component: {fileID: 5563706992824154520}
   - component: {fileID: 7113363998224926754}
+  - component: {fileID: 674228756075410565}
   m_Layer: 0
   m_Name: Warrior Red
   m_TagString: Red
@@ -292,6 +293,7 @@ Transform:
   - {fileID: 4806951962689210363}
   - {fileID: 1696478868725160891}
   - {fileID: 4021199446598084889}
+  - {fileID: 1851011580596295687}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &1228670405761227148
@@ -460,7 +462,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 84
+  m_Constraints: 116
   m_CollisionDetection: 0
 --- !u!114 &5563706992824154520
 MonoBehaviour:
@@ -477,7 +479,7 @@ MonoBehaviour:
   currentNodeInPath: 0
   pathDirection: 1
   wanderAngle: 0.5
-  maxSpeed: 5
+  maxSpeed: 8
   maxForce: 5
   slowingRadius: 5
   circleDistance: 5
@@ -509,11 +511,41 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9d90e41760beae41a0249ff16306485, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyTag: Blue
+  enemyTag: Player
   attackRange: 3
   attackCooldown: 0.7
   mainTarget: {fileID: 0}
   attackRangeColor: {r: 0, g: 0, b: 0, a: 0}
+  damage: 5
+--- !u!114 &674228756075410565
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 720334405724636633}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b6215958dac26f4590e6f3aaef76c3f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  health: 100
+  healthBar: {fileID: 97140718712768652}
+  deathEvent:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 7113363998224926754}
+        m_TargetAssemblyTypeName: MeleeAgent, Assembly-CSharp
+        m_MethodName: die
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &1034461108079842081
 GameObject:
   m_ObjectHideFlags: 0
@@ -2504,3 +2536,89 @@ Transform:
   m_Children: []
   m_Father: {fileID: 6995821381923047140}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &4223435711319656759
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 7089126939979444466}
+    m_Modifications:
+    - target: {fileID: 2534600108326768944, guid: 3de3f61e436942e42a0fe3b13e338b91,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2534600108326768944, guid: 3de3f61e436942e42a0fe3b13e338b91,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2534600108326768944, guid: 3de3f61e436942e42a0fe3b13e338b91,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2534600108326768944, guid: 3de3f61e436942e42a0fe3b13e338b91,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2534600108326768944, guid: 3de3f61e436942e42a0fe3b13e338b91,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2534600108326768944, guid: 3de3f61e436942e42a0fe3b13e338b91,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2534600108326768944, guid: 3de3f61e436942e42a0fe3b13e338b91,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2534600108326768944, guid: 3de3f61e436942e42a0fe3b13e338b91,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2534600108326768944, guid: 3de3f61e436942e42a0fe3b13e338b91,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2534600108326768944, guid: 3de3f61e436942e42a0fe3b13e338b91,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8984603142222613760, guid: 3de3f61e436942e42a0fe3b13e338b91,
+        type: 3}
+      propertyPath: m_Name
+      value: Health Bar
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3de3f61e436942e42a0fe3b13e338b91, type: 3}
+--- !u!114 &97140718712768652 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4307047213792592315, guid: 3de3f61e436942e42a0fe3b13e338b91,
+    type: 3}
+  m_PrefabInstance: {fileID: 4223435711319656759}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &1851011580596295687 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2534600108326768944, guid: 3de3f61e436942e42a0fe3b13e338b91,
+    type: 3}
+  m_PrefabInstance: {fileID: 4223435711319656759}
+  m_PrefabAsset: {fileID: 0}

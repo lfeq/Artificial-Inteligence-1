@@ -13,32 +13,33 @@ public class TowerAgent : MonoBehaviour {
     [SerializeField] private GameObject bulletPrefab;
     [SerializeField] private Transform bulletSpawnPoint;
     [SerializeField] private float shootCooldown = 2f;
+    [SerializeField] private float damage = 10f;
 
     #endregion Serializable variables
 
     #region Private variables
 
-    private float attackRange;
-    private Agent agent;
-    private List<GameObject> enemiesPercibed = new List<GameObject>();
-    private TowerAgentState towerState;
-    private Transform target;
-    private Rigidbody rb;
-    private float shootTimer = 0;
+    private float m_attackRange;
+    private Agent m_agent;
+    private List<GameObject> m_enemiesPercibed = new List<GameObject>();
+    private TowerAgentState m_towerState;
+    private Transform m_target;
+    private Rigidbody m_rb;
+    private float m_shootTimer = 0;
 
     #endregion Private variables
 
     #region Unity functions
 
     private void Start() {
-        agent = GetComponent<Agent>();
-        rb = GetComponent<Rigidbody>();
-        attackRange = agent.getEyeRadius();
+        m_agent = GetComponent<Agent>();
+        m_rb = GetComponent<Rigidbody>();
+        m_attackRange = m_agent.getEyeRadius();
     }
 
     private void Update() {
-        shootTimer -= Time.deltaTime;
-        if (shootTimer < 0) {
+        m_shootTimer -= Time.deltaTime;
+        if (m_shootTimer < 0) {
         }
     }
 
@@ -49,6 +50,18 @@ public class TowerAgent : MonoBehaviour {
 
     #endregion Unity functions
 
+    #region Public functions
+
+    /// <summary>
+    /// Called when the tower is destroyed, triggering a level event and destroying the game object.
+    /// </summary>
+    public void onTowerDestroy() {
+        LevelManager.instance.towerDestroyed();
+        Destroy(gameObject);
+    }
+
+    #endregion Public functions
+
     #region Private functions
 
     /// <summary>
@@ -56,11 +69,11 @@ public class TowerAgent : MonoBehaviour {
     /// </summary>
     private void perceptionManager() {
         // Sight
-        enemiesPercibed.Clear();
-        Collider[] percibed = Physics.OverlapSphere(agent.getEyePosition(), agent.getEyeRadius());
+        m_enemiesPercibed.Clear();
+        Collider[] percibed = Physics.OverlapSphere(m_agent.getEyePosition(), m_agent.getEyeRadius());
         foreach (Collider col in percibed) {
             if (col.CompareTag(enemyTag)) {
-                enemiesPercibed.Add(col.gameObject);
+                m_enemiesPercibed.Add(col.gameObject);
             }
         }
     }
@@ -69,25 +82,25 @@ public class TowerAgent : MonoBehaviour {
     /// Manages AI decision-making based on perceived enemies.
     /// </summary>
     private void decisonManager() {
-        if (enemiesPercibed.Count == 0) {
+        if (m_enemiesPercibed.Count == 0) {
             return;
         }
         int closestEnemy = 0;
         float minDistance = 1000f;
-        for (int i = 0; i < enemiesPercibed.Count; i++) {
-            float distanceToEnemy = Vector3.Distance(transform.position, enemiesPercibed[i].transform.position);
+        for (int i = 0; i < m_enemiesPercibed.Count; i++) {
+            float distanceToEnemy = Vector3.Distance(transform.position, m_enemiesPercibed[i].transform.position);
             if (distanceToEnemy < minDistance) {
                 closestEnemy = i;
                 minDistance = distanceToEnemy;
             }
         }
-        target = enemiesPercibed[closestEnemy].transform;
-        if (minDistance < attackRange) {
-            towerState = TowerAgentState.Attacking;
+        m_target = m_enemiesPercibed[closestEnemy].transform;
+        if (minDistance < m_attackRange) {
+            m_towerState = TowerAgentState.Attacking;
         } else {
-            towerState = TowerAgentState.None;
+            m_towerState = TowerAgentState.None;
         }
-        switch (towerState) {
+        switch (m_towerState) {
             case TowerAgentState.None:
                 break;
             case TowerAgentState.Attacking:
@@ -100,7 +113,7 @@ public class TowerAgent : MonoBehaviour {
     /// Manages movement based on the current AI state.
     /// </summary>
     private void actionManager() {
-        switch (towerState) {
+        switch (m_towerState) {
             case TowerAgentState.Attacking:
                 shoot();
                 break;
@@ -111,13 +124,13 @@ public class TowerAgent : MonoBehaviour {
     /// Initiates an attack if the attack timer allows it.
     /// </summary>
     private void shoot() {
-        if (shootTimer > 0) {
+        if (m_shootTimer > 0) {
             return;
         }
         GameObject tempBullet = Instantiate(bulletPrefab, bulletSpawnPoint.position, Quaternion.identity);
         BulletAgent bulletAgent = tempBullet.GetComponent<BulletAgent>();
-        bulletAgent.setTarget(target);
-        shootTimer = shootCooldown;
+        bulletAgent.setTarget(m_target, damage);
+        m_shootTimer = shootCooldown;
     }
 
     #endregion Private functions

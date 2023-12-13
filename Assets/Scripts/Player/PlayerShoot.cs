@@ -1,44 +1,80 @@
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-[RequireComponent(typeof(LineRenderer))]
+/// <summary>
+/// PlayerShoot class handles shooting mechanics for the player.
+/// </summary>
 public class PlayerShoot : MonoBehaviour {
+
+    #region Serializable variables
+
     [SerializeField] private float shootCooldown;
     [SerializeField] private Transform shootPosition;
+    [SerializeField] private float shootRange = 15;
+    [SerializeField] private float damage = 30f;
+    [SerializeField, Header("Audio")] private AudioClip shootSound;
+    [SerializeField, Range(0f, 1f)] private float audioVolume = 0.5f;
+
+    #endregion Serializable variables
+
+    #region Private variables
 
     private float m_shootCooldownTimer;
-    private LineRenderer m_lineRender;
     private Vector2 m_mouseLook;
+    private AudioSource m_audioSource;
 
-    private void Awake() {
-        m_lineRender = GetComponent<LineRenderer>();
+    #endregion Private variables
+
+    #region Unity functions
+
+    private void Start() {
+        m_audioSource = transform.AddComponent<AudioSource>();
+        m_audioSource.volume = audioVolume;
+        m_audioSource.playOnAwake = false;
+        m_audioSource.loop = false;
+        m_audioSource.clip = shootSound;
     }
 
     private void Update() {
         m_shootCooldownTimer -= Time.deltaTime;
     }
 
+    #endregion Unity functions
+
+    #region Public functions
+
+    /// <summary>
+    /// Called when the player performs a shoot action.
+    /// </summary>
+    /// <param name="context">The input context.</param>
     public void OnShoot(InputAction.CallbackContext context) {
         if (context.performed) {
             if (m_shootCooldownTimer <= 0) {
+                m_audioSource.Play();
                 m_shootCooldownTimer = shootCooldown;
                 PlayerManager.instance.changePlayerState(PlayerState.Shooting);
-                Vector3 mousePosition = Mouse.current.position.ReadValue();
-                Vector3 worldPosition = Camera.main.ScreenToWorldPoint(new Vector3(mousePosition.x, mousePosition.y, Camera.main.nearClipPlane));
-
                 RaycastHit hit;
-                Ray ray = Camera.main.ScreenPointToRay(m_mouseLook);
-                if (Physics.Raycast(ray, out hit)) {
-                    m_lineRender.SetPosition(0, shootPosition.position);
-                    print(hit.point);
-                    m_lineRender.SetPosition(1, worldPosition);
+                if (Physics.Raycast(shootPosition.position, transform.TransformDirection(Vector3.forward), out hit, shootRange)) {
+                    if (hit.transform.TryGetComponent<HealthManager>(out HealthManager health)) {
+                        health.takeDamage(damage);
+                    }
+                    if (hit.transform.CompareTag("Bullet")) {
+                        Destroy(hit.transform.gameObject);
+                    }
                 }
             }
         } else if (context.canceled) {
         }
     }
 
+    /// <summary>
+    /// Called when the player performs a mouse look action.
+    /// </summary>
+    /// <param name="context">The input context.</param>
     public void OnMouseLook(InputAction.CallbackContext context) {
         m_mouseLook = context.ReadValue<Vector2>();
     }
+
+    #endregion Public functions
 }

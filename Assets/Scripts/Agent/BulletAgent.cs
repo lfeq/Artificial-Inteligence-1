@@ -8,25 +8,28 @@ public class BulletAgent : MonoBehaviour {
 
     #region Private variables
 
-    private Agent agent;
-    private Transform target;
-    private Rigidbody rb;
+    private Agent m_agent;
+    private Transform m_target;
+    private Rigidbody m_rb;
+    private float m_damage;
 
     #endregion Private variables
 
     #region Unity functions
 
     private void Start() {
-        agent = GetComponent<Agent>();
-        rb = GetComponent<Rigidbody>();
+        m_agent = GetComponent<Agent>();
+        m_rb = GetComponent<Rigidbody>();
     }
 
     private void FixedUpdate() {
-        rb.velocity = SteeringBehaviours.seek(agent, target.position);
+        m_rb.velocity = SteeringBehaviours.seek(m_agent, m_target.position);
     }
 
     private void OnTriggerEnter(Collider other) {
-        if (other.gameObject == target.gameObject) {
+        if (other.gameObject == m_target.gameObject) {
+            HealthManager healthManager = other.GetComponent<HealthManager>();
+            healthManager.takeDamage(m_damage);
             Destroy(gameObject);
         }
     }
@@ -39,8 +42,9 @@ public class BulletAgent : MonoBehaviour {
     /// Sets the target for the agent to pursue or reach.
     /// </summary>
     /// <param name="t_target">The target transform to set.</param>
-    public void setTarget(Transform t_target) {
-        target = t_target;
+    public void setTarget(Transform t_target, float t_damage) {
+        m_target = t_target;
+        m_damage = t_damage;
     }
 
     #endregion Public functions

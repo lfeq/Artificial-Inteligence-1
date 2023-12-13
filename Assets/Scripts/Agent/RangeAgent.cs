@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using static MeleeAgent;
 
 /// <summary>
 /// RangeAgent class represents an agent that engages in range combat.
@@ -15,34 +16,41 @@ public class RangeAgent : MonoBehaviour {
     [SerializeField] private GameObject bulletPrefab;
     [SerializeField] private Transform bulletSpawnPosition;
     [SerializeField, Header("Debugging")] private Color attackRangeColor = Color.white;
+    [SerializeField] private float damage = 10f;
 
     #endregion Serializable variables
 
     #region Private variables
 
-    private Agent agent;
-    private List<GameObject> enemiesPercibed = new List<GameObject>();
-    private RangeAgentState rangeState;
-    private Transform target;
-    private Rigidbody rb;
-    private Animator animator;
-    private float attackTimer;
+    private Agent m_agent;
+    private List<GameObject> m_enemiesPercibed = new List<GameObject>();
+    private RangeAgentState m_rangeState;
+    private Transform m_target;
+    private Rigidbody m_rb;
+    private Animator m_animator;
+    private float m_attackTimer;
+    private bool m_isAttacking;
 
     #endregion Private variables
 
     #region Unity Functions
 
     private void Start() {
-        agent = GetComponent<Agent>();
-        rb = GetComponent<Rigidbody>();
-        animator = GetComponent<Animator>();
+        m_agent = GetComponent<Agent>();
+        m_rb = GetComponent<Rigidbody>();
+        m_animator = GetComponent<Animator>();
+        m_agent.setTargetTransform(PlayerManager.instance.transform);
+        m_isAttacking = false;
     }
 
     private void Update() {
-        attackTimer -= Time.deltaTime;
+        m_attackTimer -= Time.deltaTime;
     }
 
     private void FixedUpdate() {
+        if (m_isAttacking || m_rangeState == RangeAgentState.Dead) {
+            return;
+        }
         perceptionManager();
         decisonManager();
     }
@@ -61,7 +69,26 @@ public class RangeAgent : MonoBehaviour {
     /// </summary>
     public void spawnBullet() {
         BulletAgent tempBullet = Instantiate(bulletPrefab, bulletSpawnPosition.position, Quaternion.identity).GetComponent<BulletAgent>();
-        tempBullet.setTarget(target);
+        tempBullet.setTarget(m_target, damage);
+    }
+
+    /// <summary>
+    /// Allows the agent to continue moving after attack animation is finished.
+    /// </summary>
+    public void stopIsAttacking() {
+        m_isAttacking = false;
+    }
+
+    /// <summary>
+    /// Initiates the death sequence for the agent.
+    /// </summary>
+    public void die() {
+        if (m_rangeState == RangeAgentState.Dead) {
+            return;
+        }
+        m_rangeState = RangeAgentState.Dead;
+        m_animator.SetTrigger("IsDead");
+        Destroy(gameObject, 5f);
     }
 
     #endregion Public functions
@@ -73,31 +100,31 @@ public class RangeAgent : MonoBehaviour {
     /// </summary>
     private void perceptionManager() {
         // Sight
-        enemiesPercibed.Clear();
-        Collider[] percibed = Physics.OverlapSphere(agent.getEyePosition(), agent.getEyeRadius());
+        m_enemiesPercibed.Clear();
+        Collider[] percibed = Physics.OverlapSphere(m_agent.getEyePosition(), m_agent.getEyeRadius());
         RaycastHit hit;
         foreach (Collider col in percibed) {
             if (col.CompareTag(enemyTag)) {
-                enemiesPercibed.Add(col.gameObject);
+                m_enemiesPercibed.Add(col.gameObject);
             }
         }
         // Hearing
-        percibed = Physics.OverlapSphere(agent.getEarsPosition(), agent.getHearingRadius());
+        percibed = Physics.OverlapSphere(m_agent.getEarsPosition(), m_agent.getHearingRadius());
         foreach (Collider col in percibed) {
             if (col.CompareTag(enemyTag)) {
-                Vector3 directionToEnemy = col.transform.position - agent.getEarsPosition();
-                if (Physics.Raycast(agent.getEarsPosition(), directionToEnemy, out hit, agent.getHearingRadius())) {
+                Vector3 directionToEnemy = col.transform.position - m_agent.getEarsPosition();
+                if (Physics.Raycast(m_agent.getEarsPosition(), directionToEnemy, out hit, m_agent.getHearingRadius())) {
                     if (hit.collider == col) {
-                        enemiesPercibed.Add(col.gameObject);
+                        m_enemiesPercibed.Add(col.gameObject);
                     }
                 }
             }
         }
         // Tact
-        percibed = Physics.OverlapSphere(agent.getTactPosition(), agent.getTactRadius());
+        percibed = Physics.OverlapSphere(m_agent.getTactPosition(), m_agent.getTactRadius());
         foreach (Collider col in percibed) {
             if (col.CompareTag(enemyTag)) {
-                enemiesPercibed.Add(col.gameObject);
+                m_enemiesPercibed.Add(col.gameObject);
             }
         }
     }
@@ -108,27 +135,27 @@ public class RangeAgent : MonoBehaviour {
     private void decisonManager() {
         int closestEnemy = 0;
         float minDistance = 1000f;
-        if (enemiesPercibed.Count > 0) {
-            for (int i = 0; i < enemiesPercibed.Count; i++) {
-                float distanceToEnemy = Vector3.Distance(transform.position, enemiesPercibed[i].transform.position);
+        if (m_enemiesPercibed.Count > 0) {
+            for (int i = 0; i < m_enemiesPercibed.Count; i++) {
+                float distanceToEnemy = Vector3.Distance(transform.position, m_enemiesPercibed[i].transform.position);
                 if (distanceToEnemy < minDistance) {
                     closestEnemy = i;
                     minDistance = distanceToEnemy;
                 }
             }
-            target = enemiesPercibed[closestEnemy].transform;
+            m_target = m_enemiesPercibed[closestEnemy].transform;
         }
         if (minDistance > attackRange) {
-            rangeState = RangeAgentState.Seeking;
+            m_rangeState = RangeAgentState.Seeking;
         }
         if (minDistance < attackRange) {
-            rangeState = RangeAgentState.Attacking;
+            m_rangeState = RangeAgentState.Attacking;
         }
-        if (enemiesPercibed.Count == 0) {
-            rangeState = RangeAgentState.Seeking;
-            target = mainTarget;
+        if (m_enemiesPercibed.Count == 0) {
+            m_rangeState = RangeAgentState.Seeking;
+            m_target = mainTarget;
         }
-        switch (rangeState) {
+        switch (m_rangeState) {
             case RangeAgentState.None:
                 movementManager();
                 break;
@@ -148,18 +175,18 @@ public class RangeAgent : MonoBehaviour {
     /// Manages movement based on the current AI state.
     /// </summary>
     private void movementManager() {
-        switch (rangeState) {
+        switch (m_rangeState) {
             case RangeAgentState.None:
                 animationManager();
                 break;
             case RangeAgentState.Wandering:
                 animationManager();
-                rb.velocity = SteeringBehaviours.wander(agent);
+                m_rb.velocity = SteeringBehaviours.wander(m_agent);
                 break;
             case RangeAgentState.Seeking:
                 animationManager();
-                rb.velocity = SteeringBehaviours.pathFollowing(agent);
-                transform.LookAt(agent.getTargetTranform().position);
+                m_rb.velocity = SteeringBehaviours.pathFollowing(m_agent);
+                transform.LookAt(m_agent.getTargetTranform().position);
                 break;
             case RangeAgentState.Attacking:
                 break;
@@ -170,7 +197,7 @@ public class RangeAgent : MonoBehaviour {
     /// Manages actions based on the current AI state.
     /// </summary>
     private void actionManager() {
-        switch (rangeState) {
+        switch (m_rangeState) {
             case RangeAgentState.None:
                 break;
             case RangeAgentState.Seeking:
@@ -185,15 +212,15 @@ public class RangeAgent : MonoBehaviour {
     /// Manages animations based on the current AI state.
     /// </summary>
     private void animationManager() {
-        switch (rangeState) {
+        switch (m_rangeState) {
             case RangeAgentState.None:
-                animator.SetBool("IsMoving", false);
+                m_animator.SetBool("IsMoving", false);
                 break;
             case RangeAgentState.Seeking:
-                animator.SetBool("IsMoving", true);
+                m_animator.SetBool("IsMoving", true);
                 break;
             case RangeAgentState.Attacking:
-                animator.SetTrigger("Attack");
+                m_animator.SetTrigger("Attack");
                 break;
         }
     }
@@ -202,10 +229,13 @@ public class RangeAgent : MonoBehaviour {
     /// Initiates an attack if the attack timer allows it.
     /// </summary>
     private void attack() {
-        if (attackTimer > 0) {
+        if (m_attackTimer > 0) {
             return;
         }
-        attackTimer = attackCooldown;
+        m_attackTimer = attackCooldown;
+        m_rb.velocity = Vector3.zero;
+        m_isAttacking = true;
+        transform.LookAt(m_agent.getTargetTranform().position);
         animationManager();
     }
 
@@ -221,6 +251,7 @@ public class RangeAgent : MonoBehaviour {
         Seeking,
         Wandering,
         Attacking,
+        Dead
     }
 
     #endregion Enums

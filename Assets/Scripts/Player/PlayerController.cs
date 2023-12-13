@@ -1,17 +1,39 @@
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+/// <summary>
+/// PlayerController class handles player input, character movement, and aiming.
+/// </summary>
 [RequireComponent(typeof(PlayerManager))]
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerController : MonoBehaviour {
+
+    #region Public variables
+
     public static PlayerController instance;
 
+    #endregion Public variables
+
+    #region Serializable variables
+
     [SerializeField] private float speed;
+    [SerializeField] private AudioClip dieSound;
+    [SerializeField, Range(0, 1)] private float audioVolume = 0.5f;
+
+    #endregion Serializable variables
+
+    #region Private variables
 
     private Rigidbody m_rb;
     private Animator m_animator;
     private Vector2 m_movementVector, m_mouseLook;
     private Vector3 m_rotationTarget;
+    private AudioSource m_audioSource;
+
+    #endregion Private variables
+
+    #region Unity functions
 
     private void Awake() {
         if (FindObjectOfType<PlayerController>() != null &&
@@ -25,6 +47,11 @@ public class PlayerController : MonoBehaviour {
     private void Start() {
         m_rb = GetComponent<Rigidbody>();
         m_animator = GetComponent<Animator>();
+        m_audioSource = transform.AddComponent<AudioSource>();
+        m_audioSource.loop = false;
+        m_audioSource.clip = dieSound;
+        m_audioSource.volume = audioVolume;
+        m_audioSource.playOnAwake = false;
     }
 
     private void Update() {
@@ -41,14 +68,46 @@ public class PlayerController : MonoBehaviour {
         horizontalMovement();
     }
 
+    #endregion Unity functions
+
+    #region Public functions
+
+    /// <summary>
+    /// Called when the player moves using input.
+    /// </summary>
+    /// <param name="context">The input context.</param>
     public void OnMove(InputAction.CallbackContext context) {
         m_movementVector = context.ReadValue<Vector2>();
     }
 
+    /// <summary>
+    /// Called when the player performs a mouse look.
+    /// </summary>
+    /// <param name="context">The input context.</param>
     public void OnMouseLook(InputAction.CallbackContext context) {
         m_mouseLook = context.ReadValue<Vector2>();
     }
 
+    /// <summary>
+    /// Initiates the death of the player character.
+    /// </summary>
+    public void die() {
+        if (PlayerManager.instance.getPlayerState() == PlayerState.Dead) {
+            return;
+        }
+        PlayerManager.instance.changePlayerState(PlayerState.Dead);
+        m_animator.SetTrigger("die");
+        LevelManager.instance.showGameOverScreen();
+        m_audioSource.Play();
+    }
+
+    #endregion Public functions
+
+    #region Private functions
+
+    /// <summary>
+    /// Handles aiming based on mouse position.
+    /// </summary>
     private void aim() {
         RaycastHit hit;
         Ray ray = Camera.main.ScreenPointToRay(m_mouseLook);
@@ -64,6 +123,9 @@ public class PlayerController : MonoBehaviour {
         }
     }
 
+    /// <summary>
+    /// Handles horizontal movement based on player input.
+    /// </summary>
     private void horizontalMovement() {
         float movementX = m_movementVector.x;
         float movementY = m_movementVector.y;
@@ -79,4 +141,6 @@ public class PlayerController : MonoBehaviour {
             PlayerManager.instance.changePlayerState(PlayerState.Idle);
         }
     }
+
+    #endregion Private functions
 }

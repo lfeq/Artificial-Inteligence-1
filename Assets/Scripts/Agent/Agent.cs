@@ -41,14 +41,14 @@ public class Agent : MonoBehaviour {
 
     #region private variables
 
-    private Rigidbody rb;
+    private Rigidbody m_rb;
 
     #endregion private variables
 
     #region Unity functions
 
     private void Start() {
-        rb = GetComponent<Rigidbody>();
+        m_rb = GetComponent<Rigidbody>();
         currentNodeInPath = 0;
     }
 
@@ -65,8 +65,20 @@ public class Agent : MonoBehaviour {
 
     #region Public functions
 
+    /// <summary>
+    /// Gets the transform of the target for the agent.
+    /// </summary>
+    /// <returns>The transform of the target.</returns>
     public Transform getTargetTranform() {
         return target;
+    }
+
+    /// <summary>
+    /// Sets the target transform for the agent.
+    /// </summary>
+    /// <param name="t_target">The new target transform.</param>
+    public void setTargetTransform(Transform t_target) {
+        target = t_target;
     }
 
     /// <summary>
@@ -74,7 +86,7 @@ public class Agent : MonoBehaviour {
     /// </summary>
     /// <returns>The mass of the agent.</returns>
     public float getMass() {
-        return rb.mass;
+        return m_rb.mass;
     }
 
     /// <summary>
@@ -90,7 +102,7 @@ public class Agent : MonoBehaviour {
     /// </summary>
     /// <returns>The current velocity vector of the agent.</returns>
     public Vector3 getCurrentVelocity() {
-        return rb.velocity;
+        return m_rb.velocity;
     }
 
     /// <summary>
@@ -152,6 +164,10 @@ public class Agent : MonoBehaviour {
         return nodes;
     }
 
+    /// <summary>
+    /// Sets the list of nodes defining the path for path following behavior.
+    /// </summary>
+    /// <param name="t_nodeList">The new list of nodes.</param>
     public void setNodes(List<Vector3> t_nodeList) {
         nodes.Clear();
         nodes = t_nodeList;

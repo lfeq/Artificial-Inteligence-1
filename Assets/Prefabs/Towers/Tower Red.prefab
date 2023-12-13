@@ -345,6 +345,7 @@ GameObject:
   - component: {fileID: 7766452609852825736}
   - component: {fileID: 2031998215365870559}
   - component: {fileID: 4022752164886688533}
+  - component: {fileID: 684102277486108530}
   m_Layer: 0
   m_Name: Tower Red
   m_TagString: Red
@@ -370,6 +371,7 @@ Transform:
   - {fileID: 7002762581035386809}
   - {fileID: 1203952522966110886}
   - {fileID: 4031834435006298232}
+  - {fileID: 7970859592581144536}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
 --- !u!65 &7345049956531469262
@@ -467,11 +469,41 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f73053e4e09cdb43977621e0b4984d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyTag: Blue
+  enemyTag: Player
   bulletPrefab: {fileID: 5738725489120395971, guid: 5cd9ce439a33ac94092dc5299ea02b30,
     type: 3}
   bulletSpawnPoint: {fileID: 4031834435006298232}
   shootCooldown: 2
+  damage: 10
+--- !u!114 &684102277486108530
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6096882576492790484}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b6215958dac26f4590e6f3aaef76c3f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  health: 100
+  healthBar: {fileID: 8536343642617024339}
+  deathEvent:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 4022752164886688533}
+        m_TargetAssemblyTypeName: TowerAgent, Assembly-CSharp
+        m_MethodName: onTowerDestroy
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &7871372368538783083
 GameObject:
   m_ObjectHideFlags: 0
@@ -503,3 +535,89 @@ Transform:
   m_Children: []
   m_Father: {fileID: 7697126684865516411}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &5598708603527335656
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 7697126684865516411}
+    m_Modifications:
+    - target: {fileID: 2534600108326768944, guid: 3de3f61e436942e42a0fe3b13e338b91,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2534600108326768944, guid: 3de3f61e436942e42a0fe3b13e338b91,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 2.68
+      objectReference: {fileID: 0}
+    - target: {fileID: 2534600108326768944, guid: 3de3f61e436942e42a0fe3b13e338b91,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2534600108326768944, guid: 3de3f61e436942e42a0fe3b13e338b91,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 2534600108326768944, guid: 3de3f61e436942e42a0fe3b13e338b91,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2534600108326768944, guid: 3de3f61e436942e42a0fe3b13e338b91,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 2534600108326768944, guid: 3de3f61e436942e42a0fe3b13e338b91,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2534600108326768944, guid: 3de3f61e436942e42a0fe3b13e338b91,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2534600108326768944, guid: 3de3f61e436942e42a0fe3b13e338b91,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 2534600108326768944, guid: 3de3f61e436942e42a0fe3b13e338b91,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8984603142222613760, guid: 3de3f61e436942e42a0fe3b13e338b91,
+        type: 3}
+      propertyPath: m_Name
+      value: Health Bar
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3de3f61e436942e42a0fe3b13e338b91, type: 3}
+--- !u!4 &7970859592581144536 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2534600108326768944, guid: 3de3f61e436942e42a0fe3b13e338b91,
+    type: 3}
+  m_PrefabInstance: {fileID: 5598708603527335656}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &8536343642617024339 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4307047213792592315, guid: 3de3f61e436942e42a0fe3b13e338b91,
+    type: 3}
+  m_PrefabInstance: {fileID: 5598708603527335656}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

@@ -67,7 +67,7 @@ public class SteeringBehaviours {
     }
 
     /// <summary>
-    /// Implements the "path following" behavior to guide the agent along a predefined path of nodes.
+    /// Implements the "path following patrol" behavior to guide the agent along a predefined path of nodes.
     /// </summary>
     /// <param name="t_agent">The agent following the path.</param>
     /// <returns>The steering force vector for the path following behavior.</returns>
@@ -85,6 +85,11 @@ public class SteeringBehaviours {
         return seek(t_agent, target, true);
     }
 
+    /// <summary>
+    /// Implements the "path following" behavior to guide the agent along a predefined path of nodes.
+    /// </summary>
+    /// <param name="t_agent">The agent following the path.</param>
+    /// <returns>The steering force vector for the path following behavior.</returns>
     public static Vector3 pathFollowing(Agent t_agent) {
         Vector3 target;
         List<Vector3> nodes = t_agent.getNodes();
