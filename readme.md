@@ -4,7 +4,16 @@
 
 ## Overview
 
-Robots vs Wizards is a simple top-down shooter developed in Unity for an artificial intelligence class. In this game, you control a robot and must navigate through the environment, destroy four towers, and fend off warriors and archers to emerge victorious.
+This project showcases the implementation of artificial intelligence for agents in a Unity game environment. The primary objective is to create autonomous agents that pursue and attack the player when in close proximity. Additionally, a playable level is introduced where the player must destroy enemy towers to win.
+
+## Usage Instructions
+
+1. **Project Download:** Clone or download the project from the repository.
+
+2. **Open in Unity:** Open Unity and load the downloaded project.
+
+3. **Run Scene:** Run the main menu scene and press the play button.
+
 
 ## Features
 
@@ -103,14 +112,6 @@ Robots vs Wizards is a simple top-down shooter developed in Unity for an artific
     }
 ```
 
-## Customization
-
-In the Unity game editor, users can customize the following agent parameters:
-
-- Attack Range
-- Speed
-- Target
-
 ## Performance
 
 The AI system has been tested on a machine with 150+ FPS while running 10 agents in the scene. Further optimizations may be considered for larger-scale scenarios.
@@ -127,9 +128,11 @@ While the project meets the initial requirements, potential improvements could i
 - Additional AI behaviors or strategies.
 - Bug fixes and general improvements.
 
-## Contributing
+## Play the Game!
+You can play the game on [itch.io](https://oopolo.itch.io/robots-vs-wizards).
 
-Contributions are welcome. If you have suggestions, improvements, or find issues, please open a pull request or submit an issue.
+## Project Requirements
+- Unity (version 2022.3.10f or higher)
 
 ## Acknowledgments
 
